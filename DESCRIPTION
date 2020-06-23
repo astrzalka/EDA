@@ -1,0 +1,13 @@
+Package: EDA
+Title: Exploratory data analysis of one-dimensional data
+Version: 0.0.0.9000
+Authors@R: person('Agnieszka', 'Strzałka', email = 'the.larch19@gmail.com', role = c('cre', 'aut'))
+Description: Shiny app allowing for exploratory data analysis of one-dimensional data, support multiple comparisons between groups, produces various plots: histograms, boxplots etc.
+License: MIT + file LICENSE
+Imports: 
+    config,
+    golem,
+    shiny
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
