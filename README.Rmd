@@ -19,37 +19,16 @@ knitr::opts_chunk$set(
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
-The goal of EDA is to ...
+The goal of EDA is to provide a quick way to analyse data, perform basic statistical tests for group comparison and produce plots such as histograms or boxplots.
 
 ## Installation
 
-You can install the released version of EDA from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of EDA from Github:
 
 ``` r
-install.packages("EDA")
+devtools::install_github('astrzalka/EDA')
 ```
 
-## Example
+ 
+EDA includes example datasets stored in data-raw directory. Example dataset przyklad.txt is uncluded in the app itself for easy testing
 
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
-library(EDA)
-## basic example code
-```
-
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
-```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!
