@@ -24,6 +24,7 @@ usethis::use_package( "ggpubr" )
 usethis::use_package( "stringr" )
 usethis::use_package( "ggbeeswarm" )
 usethis::use_package( "magrittr" )
+usethis::use_package( "Hmisc" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/
