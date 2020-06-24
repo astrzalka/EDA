@@ -14,7 +14,7 @@ app_ui <- function(request) {
                  tabPanel("Dane",
                           sidebarLayout(
                             sidebarPanel("Wczytaj plik w formacie .txt, .csv lub .excel", 
-                                         radioButtons('rodzaj_dane', 'Jakie dane chcesz wczytać?', c('txt', 'excel'), inline = TRUE),
+                                         radioButtons('rodzaj_dane', 'Jakie dane chcesz wczytać?', c('txt', 'excel', 'przykład'), inline = TRUE),
                                          fileInput("dane", 'Wybierz plik .txt',
                                                    accept=c('.txt')),
                                          fileInput('dane_xls', 'Wybierz plik excel'),

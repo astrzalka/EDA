@@ -12,6 +12,8 @@ app_server <- function( input, output, session ) {
     if(input$rodzaj_dane == 'txt'){
       inFile <- input$dane
       if (is.null(inFile))
+        # d <- przyklad
+        # return(d)
         return(NULL)
       d <- read.table(inFile$datapath, header=as.logical(input$header), fill = TRUE, sep = input$sep, quote = "\"")
       return(d)
@@ -21,6 +23,11 @@ app_server <- function( input, output, session ) {
       if (is.null(inFile_excel))
         return(NULL)
       d <- readxl::read_excel(path = inFile_excel$datapath, col_names = as.logical(input$header))
+      return(d)
+    }
+    
+    if(input$rodzaj_dane == 'przykład'){
+      d <- przyklad
       return(d)
     }
   }) 
@@ -33,7 +40,7 @@ app_server <- function( input, output, session ) {
     } else {
       dane_2 <- dane()
       
-      dane_2 <- gather(dane_2, rodzaj, wartosc)
+      dane_2 <- tidyr::gather(dane_2, rodzaj, wartosc)
       
       dane_2 <- dane_2[,c(2,1)]
       
@@ -112,7 +119,7 @@ app_server <- function( input, output, session ) {
   })  
   
   output$histogram <- renderPlot({
-    if (is.null(input$dane)&is.null(input$dane_xls))
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
     print(histogramInput())
   })
@@ -182,7 +189,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$density <- renderPlot({
-    if (is.null(input$dane)&is.null(input$dane_xls))
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
     print(densityInput())
   })
@@ -943,7 +950,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$boxplot <- renderPlot({
-    if (is.null(input$dane) & is.null(input$dane_xls))
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
     print(boxplotInput())
   })
@@ -959,7 +966,7 @@ app_server <- function( input, output, session ) {
   
   output$podsum <- renderTable({
     
-    if (is.null(input$dane)&is.null(input$dane_xls))
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
     
     dane <- final()
@@ -982,7 +989,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$ttest <- renderTable({
-    if (is.null(input$dane)&is.null(input$dane_xls))
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
     
     dane <- final()
@@ -995,7 +1002,7 @@ app_server <- function( input, output, session ) {
   digits = -1)
   
   output$wtest <- renderTable({
-    if (is.null(input$dane)&is.null(input$dane_xls))
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
     
     dane <- final()
@@ -1007,7 +1014,7 @@ app_server <- function( input, output, session ) {
   digits = -1)
   
   output$anova1 <- renderPrint({
-    if (is.null(input$dane)&is.null(input$dane_xls))
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
     
     dane <- final()
@@ -1021,7 +1028,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$anova2 <- renderPrint({
-    if (is.null(input$dane)&is.null(input$dane_xls))
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
     
     dane <- final()
@@ -1051,7 +1058,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$anova_plot <- renderPlot({
-    if (is.null(input$dane)&is.null(input$dane_xls))
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
     
     if(input$posthoc == TRUE){
