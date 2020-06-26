@@ -25,6 +25,8 @@ usethis::use_package( "stringr" )
 usethis::use_package( "ggbeeswarm" )
 usethis::use_package( "magrittr" )
 usethis::use_package( "Hmisc" )
+usethis::use_package( "userfriendlyscience" )
+usethis::use_package( "shinythemes" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/
