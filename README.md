@@ -18,7 +18,9 @@ histograms or boxplots.
 You can install the released version of EDA from Github:
 
 ``` r
-install.packages("EDA")
+devtools::install_github('astrzalka/EDA')
+
+EDA::run_app()
 ```
 
 EDA includes example datasets stored in data-raw directory. Example

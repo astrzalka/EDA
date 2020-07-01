@@ -27,6 +27,8 @@ You can install the released version of EDA from Github:
 
 ``` r
 devtools::install_github('astrzalka/EDA')
+
+EDA::run_app()
 ```
 
  
