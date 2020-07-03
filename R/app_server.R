@@ -269,7 +269,7 @@ app_server <- function( input, output, session ) {
         if(input$punkty %in% c('beeswarm', 'quasirandom')){
           
           if(input$porownanie == 'brak'){
-            p <- ggboxplot(wb, x = nazwy[2], y = nazwy[1],
+            p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
                            color = nazwy[2], legend.title = input$legenda_nazwa_box,
                            xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$punkty == 'beeswarm'){
@@ -288,7 +288,7 @@ app_server <- function( input, output, session ) {
           
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
-            p <- ggboxplot(wb, x = nazwy[2], y = nazwy[1],
+            p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
                            color = nazwy[2],  legend.title = input$legenda_nazwa_box,
                            xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.adj..),
@@ -314,7 +314,7 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(input$porownania, ';')
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
-            p <- ggboxplot(wb, x = nazwy[2], y = nazwy[1],
+            p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
                            color = nazwy[2],  legend.title = input$legenda_nazwa_box,
                            xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
@@ -352,7 +352,7 @@ app_server <- function( input, output, session ) {
           if(input$porownanie == 'kontrola'){
             wb <- as.data.frame(wb)
             grupy <- levels(as.factor(wb[,2]))
-            p <- ggboxplot(wb, x = nazwy[2], y = nazwy[1],
+            p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
                            color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
                            xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
@@ -370,7 +370,7 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(input$porownania, ';')
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
-            p <- ggboxplot(wb, x = nazwy[2], y = nazwy[1],
+            p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
                            color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
                            xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
@@ -384,7 +384,7 @@ app_server <- function( input, output, session ) {
         if(input$punkty %in% c('beeswarm', 'quasirandom')){
           
           if(input$porownanie == 'brak'){
-            p <- ggboxplot(wb, x = nazwy[2], y = nazwy[1],
+            p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
                            color = nazwy[2],  legend.title = input$legenda_nazwa_box,
                            xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$punkty == 'beeswarm'){
@@ -403,7 +403,7 @@ app_server <- function( input, output, session ) {
           
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
-            p <- ggboxplot(wb, x = nazwy[2], y = nazwy[1],
+            p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
                            color = nazwy[2],  legend.title = input$legenda_nazwa_box,
                            xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
@@ -429,7 +429,7 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(input$porownania, ';')
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
-            p <- ggboxplot(wb, x = nazwy[2], y = nazwy[1],
+            p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
                            color = nazwy[2],  legend.title = input$legenda_nazwa_box,
                            xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
