@@ -16,15 +16,21 @@ app_ui <- function(request) {
                           sidebarLayout(
                             sidebarPanel("Wczytaj plik w formacie .txt, .csv lub .excel", 
                                          radioButtons('rodzaj_dane', 'Jakie dane chcesz wczytać?', c('txt', 'excel', 'przykład'), inline = TRUE),
-                                         fileInput("dane", 'Wybierz plik .txt',
-                                                   accept=c('.txt')),
-                                         fileInput('dane_xls', 'Wybierz plik excel'),
-                                         radioButtons('sep', 'Separator? (tylko pliki txt)',
-                                                      c(Przecinek=',',
-                                                        Średnik=';',
-                                                        Tabulator='\t', 
-                                                        Spacja = " "),
-                                                      ' ', inline = TRUE),
+                                         conditionalPanel(condition = 'input.rodzaj_dane == "txt"',
+                                                          fileInput("dane", 'Wybierz plik .txt',
+                                                                    accept=c('.txt'))
+                                         ),
+                                         conditionalPanel(condition = 'input.rodzaj_dane == "excel"',
+                                                          fileInput('dane_xls', 'Wybierz plik excel')
+                                         ),
+                                         conditionalPanel(condition = 'input.rodzaj_dane == "txt"',
+                                                          radioButtons('sep', 'Separator? (tylko pliki txt)',
+                                                                       c(Przecinek=',',
+                                                                         Średnik=';',
+                                                                         Tabulator='\t', 
+                                                                         Spacja = " "),
+                                                                       ' ', inline = TRUE)
+                                         ),
                                          radioButtons("header", "Czy kolummy mają nagłówki", choices = list("Tak" = TRUE, "Nie" = FALSE), selected = TRUE, inline = TRUE),
                                          radioButtons('format', 'Czy zmienić format danych na wąski', choices = list('Tak' = TRUE, 'Nie' = FALSE), selected = FALSE, inline = TRUE),
                                          numericInput("num1", "Numer kolumny zmiennej objaśnianej", value = 1),
@@ -46,16 +52,25 @@ app_ui <- function(request) {
                               radioButtons("os_y", "Oś Y?", choices = list("count" = 1, "density" = 2), selected = 1, inline = TRUE),
                               radioButtons('kolory_hist', 'Jaką skalę kolorów zastosować?', c('domyślna', 'colorbrewer', 'viridis', 'odcienie szarości', 'własna :)'),
                                            selected = 'domyślna', inline = TRUE),
-                              selectInput('colorbrewer_hist', label = 'Którą skalę Colorbrewer zastosować?', 
-                                          choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'), 
-                                          selected = 'Set1', multiple = FALSE),
-                              selectInput('viridis_hist', label = 'Którą skalę viridis zastosować?', 
-                                          choices = c('viridis', 'magma', 'plasma', 'inferno', 'cividis'), 
-                                          selected = 'viridis', multiple = FALSE),
-                              textInput('wlasne_kolory_hist', 'Tutaj wpisz wybrane nazwy kolorów oddzielając je przecinkiem. Powinny być to kolory 
+                              conditionalPanel(
+                                condition = "input.kolory_hist == 'colorbrewer'",
+                                selectInput('colorbrewer_hist', label = 'Którą skalę Colorbrewer zastosować?',
+                                            choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'),
+                                            selected = 'Set1', multiple = FALSE)
+                              ),
+                              conditionalPanel(
+                                condition = "input.kolory_hist == 'viridis'",
+                                selectInput('viridis_hist', label = 'Którą skalę viridis zastosować?',
+                                            choices = c('viridis', 'magma', 'plasma', 'inferno', 'cividis'),
+                                            selected = 'viridis', multiple = FALSE)
+                              ),
+                              conditionalPanel(
+                                condition = "input.kolory_hist == 'własna :)'",
+                                textInput('wlasne_kolory_hist', 'Tutaj wpisz wybrane nazwy kolorów oddzielając je przecinkiem. Powinny być to kolory 
                                           predefiniowane w R (można sprawdzić jakie np. na stronie 
                                           http://sape.inf.usi.ch/quick-reference/ggplot2/colour) albo skorzystać 
-                                          z notacji #FF0000'),
+                                          z notacji #FF0000')
+                              ),
                               textInput('os_x', 'Nazwa osi X', 'Wartość'),
                               textInput('os_y_nazwa', 'Nazwa osi Y', 'Liczba'),
                               downloadButton('download_histogram', 'Pobierz wykres (dodaj .png do nazwy pliku)'),
@@ -74,16 +89,25 @@ app_ui <- function(request) {
                                            selected = "FALSE", inline = TRUE),
                               radioButtons('kolory_dens', 'Jaką skalę kolorów zastosować?', c('domyślna', 'colorbrewer', 'viridis', 'odcienie szarości', 'własna :)'),
                                            selected = 'domyślna', inline = TRUE),
-                              selectInput('colorbrewer_dens', label = 'Którą skalę Colorbrewer zastosować?', 
-                                          choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'), 
-                                          selected = 'Set1', multiple = FALSE),
-                              selectInput('viridis_dens', label = 'Którą skalę viridis zastosować?', 
-                                          choices = c('viridis', 'magma', 'plasma', 'inferno', 'cividis'), 
-                                          selected = 'viridis', multiple = FALSE),
-                              textInput('wlasne_kolory_dens', 'Tutaj wpisz wybrane nazwy kolorów oddzielając je przecinkiem. Powinny być to kolory 
+                              conditionalPanel(
+                                condition = "input.kolory_dens == 'colorbrewer'",
+                                selectInput('colorbrewer_dens', label = 'Którą skalę Colorbrewer zastosować?',
+                                            choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'),
+                                            selected = 'Set1', multiple = FALSE)
+                              ),
+                              conditionalPanel(
+                                condition = "input.kolory_dens == 'viridis'",
+                                selectInput('viridis_dens', label = 'Którą skalę viridis zastosować?',
+                                            choices = c('viridis', 'magma', 'plasma', 'inferno', 'cividis'),
+                                            selected = 'viridis', multiple = FALSE)
+                              ),
+                              conditionalPanel(
+                                condition = "input.kolory_dens == 'własna :)'",
+                                textInput('wlasne_kolory_dens', 'Tutaj wpisz wybrane nazwy kolorów oddzielając je przecinkiem. Powinny być to kolory 
                                           predefiniowane w R (można sprawdzić jakie np. na stronie 
                                           http://sape.inf.usi.ch/quick-reference/ggplot2/colour) albo skorzystać 
-                                          z notacji #FF0000'),
+                                          z notacji #FF0000')
+                              ),
                               textInput('os_x_dens', 'Nazwa osi X', 'Wartość'),
                               textInput('os_y_dens', 'Nazwa osi Y', 'Liczba'),
                               downloadButton('download_density', 'Pobierz wykres (dodaj .png do nazwy pliku)'),
@@ -103,31 +127,46 @@ app_ui <- function(request) {
                               radioButtons('porownanie', 'Jakie chcesz wykonać porównanie', 
                                            list('brak' = 'brak', 'Tylko wobec kontroli' = 'kontrola', 
                                                 'Pomiędzy niektórymi grupami (podaj niżej)' = 'grupy')),
-                              numericInput('kontrola', 'Która grupa to kontrola?', 1, min = 1),
-                              textInput('porownania', 'Tutaj wpisz grupy do porównania w formacie:
-                                          Typ_A Typ_B;Typ_A Typ_C'),
+                              conditionalPanel(condition = 'input.porownanie == "kontrola"',
+                                               numericInput('kontrola', 'Która grupa to kontrola?', 1, min = 1)
+                              ),
+                              conditionalPanel(condition = 'input.porownanie == "grupy"',
+                                               textInput('porownania', 'Tutaj wpisz grupy do porównania w formacie:
+                                          Typ_A Typ_B;Typ_A Typ_C')
+                              ),
                               radioButtons('punkty', 'Czy dodać wszystkie obserwacje?', 
                                            c('Nie' = 'none', 'Tak (jitter)' = "jitter", 'Tak (beeswarm)' = 'beeswarm', 
                                              'Tak (quasirandom)' = 'quasirandom'), 
                                            inline = TRUE),
-                              radioButtons('rodzaj_test', 'Jaki test zastosować?', 
-                                           c('t.test' = 't.test', 'wilcoxon' = 'wilcox.test'), inline = TRUE),
-                              radioButtons('p_format', 'Jak pokazać wartość p?', c('Liczbowo' = 'p.adj', 'Gwiazdki' = 'p.signif'), inline = TRUE),
+                              conditionalPanel(condition ='input.porownanie != "brak"' ,
+                                               radioButtons('rodzaj_test', 'Jaki test zastosować?', 
+                                                            c('t.test' = 't.test', 'wilcoxon' = 'wilcox.test'), inline = TRUE),
+                                               radioButtons('p_format', 'Jak pokazać wartość p?', c('Liczbowo' = 'p.adj', 'Gwiazdki' = 'p.signif'), inline = TRUE)
+                              ),
                               radioButtons('anova', 'Czy dodać wynik Anova lub Kruskal Wallis test?', 
                                            c('Nie' = 'nie','Anova' = 'anova', 'Kruskal Wallis' = 'kruskal.test'), 
                                            selected = 'nie', inline = TRUE),
                               radioButtons('kolory', 'Jaką skalę kolorów zastosować?', c('domyślna', 'colorbrewer', 'viridis', 'odcienie szarości', 'własna :)'),
                                            selected = 'domyślna', inline = TRUE),
-                              selectInput('colorbrewer', label = 'Którą skalę Colorbrewer zastosować?', 
-                                          choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'), 
-                                          selected = 'Set1', multiple = FALSE),
-                              selectInput('viridis', label = 'Którą skalę viridis zastosować?', 
-                                          choices = c('viridis', 'magma', 'plasma', 'inferno', 'cividis'), 
-                                          selected = 'viridis', multiple = FALSE),
-                              textInput('wlasne_kolory', 'Tutaj wpisz wybrane nazwy kolorów oddzielając je przecinkiem. Powinny być to kolory 
+                              conditionalPanel(
+                                condition = "input.kolory == 'colorbrewer'",
+                                selectInput('colorbrewer', label = 'Którą skalę Colorbrewer zastosować?',
+                                            choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'),
+                                            selected = 'Set1', multiple = FALSE)
+                              ),
+                              conditionalPanel(
+                                condition = "input.kolory == 'viridis'",
+                                selectInput('viridis', label = 'Którą skalę viridis zastosować?',
+                                            choices = c('viridis', 'magma', 'plasma', 'inferno', 'cividis'),
+                                            selected = 'viridis', multiple = FALSE)
+                              ),
+                              conditionalPanel(
+                                condition = "input.kolory == 'własna :)'",
+                                textInput('wlasne_kolory', 'Tutaj wpisz wybrane nazwy kolorów oddzielając je przecinkiem. Powinny być to kolory 
                                           predefiniowane w R (można sprawdzić jakie np. na stronie 
                                           http://sape.inf.usi.ch/quick-reference/ggplot2/colour) albo skorzystać 
-                                          z notacji #FF0000'),
+                                          z notacji #FF0000')
+                              ),
                               textInput('os_x_box', 'Nazwa osi X', 'Wartość'),
                               textInput('os_y_box', 'Nazwa osi Y', 'Liczba'),
                               #textInput('legenda_nazwa_box', 'Nazwa legendy', ''),

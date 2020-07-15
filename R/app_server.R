@@ -1206,4 +1206,43 @@ app_server <- function( input, output, session ) {
   # )
   
   
+  # additional UI elements
+  
+  # color
+  
+  output$color_scale <- renderUI({
+    
+    radioButtons('kolory_skala', 'Jaką skalę kolorów zastosować?', c('domyślna', 'colorbrewer', 'viridis', 'odcienie szarości', 'własna :)'),
+                 selected = 'domyślna', inline = TRUE)
+    
+    
+  })
+  
+  
+  output$color_brewer <- renderUI({
+    if(input$kolory_skala == 'colorbrewer'){
+      
+      selectInput('brewer_kolory', label = 'Którą skalę Colorbrewer zastosować?', 
+                  choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'), 
+                  selected = 'Set1', multiple = FALSE)
+      
+    } else {
+      return(NULL)
+    }
+    
+  })
+  
+  output$color_viridis <- renderUI({
+    if(input$kolory_skala == 'viridis'){
+      
+      selectInput('viridis_kolory', label = 'Którą skalę viridis zastosować?', 
+                  choices = c('viridis', 'magma', 'plasma', 'inferno', 'cividis'), 
+                  selected = 'viridis', multiple = FALSE)
+      
+    } else {
+      return(NULL)
+    }
+    
+  })
+  
 }
