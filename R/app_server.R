@@ -36,25 +36,50 @@ app_server <- function( input, output, session ) {
   final <- reactive ({
     
     if(input$format == FALSE){
-      wybor(dane(), input$num1, input$num2)
+      dane <- wybor(dane(), input$num1, input$num2)
     } else {
       dane_2 <- dane()
       
       dane_2 <- tidyr::gather(dane_2, rodzaj, wartosc)
       
-      dane_2 <- dane_2[,c(2,1)]
+      dane <- dane_2[,c(2,1)]
       
     }
+    
+    dane <- dane[dane[,2] %in% input$grupy,]
+    
+    
+    return(dane)
+  })
+  
+  output$grupy <- renderUI({
+    
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    
+    if(input$format == TRUE){
+      dane <- dane()
+      
+      dane <- tidyr::gather(dane, rodzaj, wartosc)
+      
+      dane <- dane[,c(2,1)]
+    } else {
+      dane <- wybor(dane(), input$num1, input$num2)
+    }
+    
+    colnames(dane) <- c('wartosc', 'grupy')
+    
+    grupy <- unique(dane$grupy)
+    
+    checkboxGroupInput("grupy", label = ("Wybierz grupy do analizy"), 
+                       choices = grupy,
+                       selected = grupy)
     
   })
   
   
   output$contents <- renderTable({
-    if(input$format == FALSE){
-      dane()
-    } else {
-      final()
-    }
+    final()
   })
   
   histogramInput <- reactive({
@@ -80,11 +105,11 @@ app_server <- function( input, output, session ) {
     } else {
       if ( input$os_y == 2){
         p <- p + ggplot2::geom_histogram(ggplot2::aes(x = eval(parse(text = nazwy[1])), y = ..density.., fill = as.factor(eval(parse(text = nazwy[2])))), 
-                                position = "dodge", binwidth = input$bin)+
+                                         position = "dodge", binwidth = input$bin)+
           ggplot2::theme_bw()+ggplot2::xlab(nazwy[1])#+ggplot2::scale_fill_discrete(nazwy[2])
       } else {
         p <- p + ggplot2::geom_histogram(ggplot2::aes(x = eval(parse(text = nazwy[1])), fill = as.factor(eval(parse(text = nazwy[2])))), position = "dodge", 
-                                binwidth = input$bin)+
+                                         binwidth = input$bin)+
           ggplot2::theme_bw()+ggplot2::xlab(nazwy[1])#+ggplot2::scale_fill_discrete(nazwy[2])
       }
       
@@ -146,7 +171,7 @@ app_server <- function( input, output, session ) {
     
     if(input$fill_dens == TRUE){
       p <- p + ggplot2::geom_density(ggplot2::aes(x = eval(parse(text = nazwy[1])), color = as.factor(eval(parse(text = nazwy[2]))),
-                                fill = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.3)+
+                                                  fill = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.3)+
         ggplot2::theme_bw()+ggplot2::xlab(nazwy[1])
       
       if(input$kolory_dens == 'domyślna'){
@@ -225,8 +250,8 @@ app_server <- function( input, output, session ) {
         if(input$punkty %in% c('none', 'jitter')){
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -236,10 +261,10 @@ app_server <- function( input, output, session ) {
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.adj..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -254,10 +279,10 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -270,15 +295,15 @@ app_server <- function( input, output, session ) {
           
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -289,17 +314,17 @@ app_server <- function( input, output, session ) {
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2],  legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2],  legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.adj..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -315,17 +340,17 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2],  legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2],  legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -341,8 +366,8 @@ app_server <- function( input, output, session ) {
         if(input$punkty %in% c('none', 'jitter')){
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -353,10 +378,10 @@ app_server <- function( input, output, session ) {
             wb <- as.data.frame(wb)
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -371,10 +396,10 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -385,15 +410,15 @@ app_server <- function( input, output, session ) {
           
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2],  legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2],  legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -404,17 +429,17 @@ app_server <- function( input, output, session ) {
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2],  legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2],  legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -430,17 +455,17 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggboxplot(wb, x = nazwy[2], y = nazwy[1],
-                           color = nazwy[2],  legend.title = input$legenda_nazwa_box,
-                           xlab = input$os_x_box, ylab = input$os_y_box)
+                                   color = nazwy[2],  legend.title = input$legenda_nazwa_box,
+                                   xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -460,8 +485,8 @@ app_server <- function( input, output, session ) {
         if(input$punkty %in% c('none', 'jitter')){
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -471,10 +496,10 @@ app_server <- function( input, output, session ) {
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.adj..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -489,10 +514,10 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -505,15 +530,15 @@ app_server <- function( input, output, session ) {
           
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -524,17 +549,17 @@ app_server <- function( input, output, session ) {
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.adj..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -550,17 +575,17 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -576,8 +601,8 @@ app_server <- function( input, output, session ) {
         if(input$punkty %in% c('none', 'jitter')){
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -588,10 +613,10 @@ app_server <- function( input, output, session ) {
             wb <- as.data.frame(wb)
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -609,7 +634,7 @@ app_server <- function( input, output, session ) {
                           color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
                           xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -620,15 +645,15 @@ app_server <- function( input, output, session ) {
           
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -639,17 +664,17 @@ app_server <- function( input, output, session ) {
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -665,17 +690,17 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggviolin(wb, x = nazwy[2], y = nazwy[1],
-                          color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                          xlab = input$os_x_box, ylab = input$os_y_box)
+                                  color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                  xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -697,8 +722,8 @@ app_server <- function( input, output, session ) {
         if(input$punkty %in% c('none', 'jitter')){
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2],  add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -708,10 +733,10 @@ app_server <- function( input, output, session ) {
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.adj..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -726,10 +751,10 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -742,15 +767,15 @@ app_server <- function( input, output, session ) {
           
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -761,17 +786,17 @@ app_server <- function( input, output, session ) {
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2],  legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2],  legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.adj..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -787,17 +812,17 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -813,8 +838,8 @@ app_server <- function( input, output, session ) {
         if(input$punkty %in% c('none', 'jitter')){
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -825,10 +850,10 @@ app_server <- function( input, output, session ) {
             wb <- as.data.frame(wb)
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
             }
@@ -843,10 +868,10 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2], add = input$punkty, legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -857,15 +882,15 @@ app_server <- function( input, output, session ) {
           
           if(input$porownanie == 'brak'){
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -876,17 +901,17 @@ app_server <- function( input, output, session ) {
           if(input$porownanie == 'kontrola'){
             grupy <- levels(as.factor(wb[,2]))
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, ref.group = grupy[input$kontrola])
+                                                method = input$rodzaj_test, ref.group = grupy[input$kontrola])
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -902,17 +927,17 @@ app_server <- function( input, output, session ) {
             my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
             
             p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = nazwy[2], y = nazwy[1],
-                             color = nazwy[2], legend.title = input$legenda_nazwa_box,
-                             xlab = input$os_x_box, ylab = input$os_y_box)
+                                     color = nazwy[2], legend.title = input$legenda_nazwa_box,
+                                     xlab = input$os_x_box, ylab = input$os_y_box)
             p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                        method = input$rodzaj_test, comparisons = my_comparisons)
+                                                method = input$rodzaj_test, comparisons = my_comparisons)
             if(input$punkty == 'beeswarm'){
               p <- p + ggbeeswarm::geom_beeswarm(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))), 
-                                         color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                              color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$punkty == 'quasirandom'){
               p <- p + ggbeeswarm::geom_quasirandom(ggplot2::aes(y = eval(parse(text = nazwy[1])), x = as.factor(eval(parse(text = nazwy[2]))),
-                                            color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
+                                                                 color = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.4)
             }
             if(input$anova != 'nie') {
               p <- p + ggpubr::stat_compare_means(method = input$anova, label.y = max(wb[,1]) *1.2)
@@ -979,12 +1004,12 @@ app_server <- function( input, output, session ) {
     
     dane %>% dplyr::group_by(grupy) %>% 
       dplyr::summarise(średnia = round(mean(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
-                 mediana = round(median(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
-                 odchylenie = round(sd(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
-                 minimum = round(min(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
-                 maximum = round(max(eval(parse(text = nazwy[1])), na.rm = TRUE),2), 
-                 n = length(eval(parse(text = nazwy[1]))),
-                 przed.ufnosci.nor = round(1.96 * (odchylenie/sqrt(n)),2))
+                        mediana = round(median(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                        odchylenie = round(sd(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                        minimum = round(min(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                        maximum = round(max(eval(parse(text = nazwy[1])), na.rm = TRUE),2), 
+                        n = length(eval(parse(text = nazwy[1]))),
+                        przed.ufnosci.nor = round(1.96 * (odchylenie/sqrt(n)),2))
     
   })
   
@@ -1002,7 +1027,7 @@ app_server <- function( input, output, session ) {
       dplyr::mutate(model = list(shapiro.test(data$wartosc)))
     
     wyniki <- models %>% dplyr::summarise(broom::tidy(model))
-
+    
     
     return(wyniki)
     
@@ -1124,7 +1149,7 @@ app_server <- function( input, output, session ) {
       tabela <- as.data.frame(tukey[[1]])
       tabela$zmienna <- rownames(tabela)
       p <- ggplot2::ggplot(tabela, ggplot2::aes(x = zmienna, y = diff, ymin = lwr, ymax = upr), 
-                  environment = envir)
+                           environment = envir)
       p <- p + ggplot2::geom_pointrange()+
         ggplot2::coord_flip()+
         ggplot2::geom_hline(yintercept = 0)+

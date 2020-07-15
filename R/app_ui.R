@@ -11,7 +11,7 @@ app_ui <- function(request) {
     # List the first level UI elements here 
     fluidPage(
       theme = shinythemes::shinytheme("united"),
-      navbarPage("EDA :) 1.3",
+      navbarPage("EDA :) 1.4",
                  tabPanel("Dane",
                           sidebarLayout(
                             sidebarPanel("Wczytaj plik w formacie .txt, .csv lub .excel", 
@@ -28,7 +28,9 @@ app_ui <- function(request) {
                                          radioButtons("header", "Czy kolummy mają nagłówki", choices = list("Tak" = TRUE, "Nie" = FALSE), selected = TRUE, inline = TRUE),
                                          radioButtons('format', 'Czy zmienić format danych na wąski', choices = list('Tak' = TRUE, 'Nie' = FALSE), selected = FALSE, inline = TRUE),
                                          numericInput("num1", "Numer kolumny zmiennej objaśnianej", value = 1),
-                                         numericInput("num2", "Numer kolumny zmiennej objaśniającej", value = 2)
+                                         numericInput("num2", "Numer kolumny zmiennej objaśniającej", value = 2),
+                                         uiOutput('grupy')
+                                         
                                          # radioButtons('format', 'Format dokumentu', c('HTML'),
                                          #              inline = TRUE),
                                          # downloadButton('downloadReport')
