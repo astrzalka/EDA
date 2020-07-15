@@ -142,6 +142,14 @@ app_ui <- function(request) {
                           mainPanel(tableOutput("podsum"))
                           
                  ),
+                 tabPanel("Test na dopasowanie do rozkładu normalnego",
+                          sidebarLayout(
+                            sidebarPanel(),
+                            mainPanel(h3('Uwaga, rozkład nie różni się od rozkładu normalnego jeżeli wartość p jest wyższa od 0.05.'),
+                                      tableOutput("test_nor"),
+                                      plotOutput("nor_plot", height = 600))
+                          )
+                 ),
                  tabPanel("Test t-studenta",
                           sidebarLayout(
                             sidebarPanel(),

@@ -988,6 +988,54 @@ app_server <- function( input, output, session ) {
     
   })
   
+  
+  test_nor_wynik <- reactive({
+    
+    dane <- final()
+    
+    nazwy <- colnames(dane)
+    
+    colnames(dane) <- c('wartosc', 'grupy')
+    
+    models <- dane %>% 
+      dplyr::nest_by(grupy)  %>%
+      dplyr::mutate(model = list(shapiro.test(data$wartosc)))
+    
+    wyniki <- models %>% dplyr::summarise(broom::tidy(model))
+
+    
+    return(wyniki)
+    
+  })
+  
+  output$test_nor <- renderTable(test_nor_wynik())
+  
+  normality_plot <- reactive({
+    
+    dane <- final()
+    
+    nazwy <- colnames(dane)
+    
+    colnames(dane) <- c('wartosc', 'grupy')
+    
+    p <- ggpubr::ggqqplot(dane, "wartosc")
+    
+    p <- p + ggplot2::facet_wrap(~grupy)+
+      ggplot2::theme_bw()+
+      ggplot2::theme(aspect.ratio = 1) # makes the plots to be always square
+    
+    print(p)
+    
+  })
+  
+  
+  output$nor_plot <- renderPlot({
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    print(normality_plot())
+  })
+  
+  
   output$ttest <- renderTable({
     if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)

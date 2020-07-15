@@ -27,6 +27,7 @@ usethis::use_package( "magrittr" )
 usethis::use_package( "Hmisc" )
 usethis::use_package( "userfriendlyscience" )
 usethis::use_package( "shinythemes" )
+usethis::use_package( "broom" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -68,3 +69,4 @@ usethis::use_appveyor()
 # go to dev/03_deploy.R
 rstudioapi::navigateToFile("dev/03_deploy.R")
 
+golem::set_golem_version('1.4')
