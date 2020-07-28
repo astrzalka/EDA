@@ -90,6 +90,7 @@ app_server <- function( input, output, session ) {
     
     nazwy <- colnames(wb)
     
+
     if(input$bin == 0){
       
       bin <- mean(wb[,nazwy[1]], na.rm = TRUE) / 10
@@ -98,6 +99,7 @@ app_server <- function( input, output, session ) {
       bin <- input$bin
     }
     
+
     p <- draw_histogram(wb = wb,
                         variable = nazwy[1],
                         facet_draw = input$facet,
