@@ -48,7 +48,7 @@ app_ui <- function(request) {
                           sidebarLayout(
                             sidebarPanel(
                               numericInput("bin", "Szerokość słupków", value=1, step = 0.1),
-                              radioButtons("facet", "Czy podzielić na panele?", choices = list("Tak" = "TRUE", "Nie" = "FALSE"), selected = "TRUE", inline = TRUE),
+                              radioButtons("facet", "Czy podzielić na panele?", choices = list("Tak" = TRUE, "Nie" = FALSE), selected = TRUE, inline = TRUE),
                               radioButtons("os_y", "Oś Y?", choices = list("count" = 1, "density" = 2), selected = 1, inline = TRUE),
                               radioButtons('kolory_hist', 'Jaką skalę kolorów zastosować?', c('domyślna', 'colorbrewer', 'viridis', 'odcienie szarości', 'własna :)'),
                                            selected = 'domyślna', inline = TRUE),
