@@ -90,6 +90,7 @@ app_server <- function( input, output, session ) {
     
     nazwy <- colnames(wb)
     
+<<<<<<< HEAD
     if(input$bin == 0){
       
       bin <- mean(wb[,nazwy[1]], na.rm = TRUE) / 10
@@ -98,11 +99,17 @@ app_server <- function( input, output, session ) {
       bin <- input$bin
     }
     
+=======
+>>>>>>> 4129f79a4421fe3ceb7c562b80c9ca6c46b0e7c8
     p <- draw_histogram(wb = wb,
                         variable = nazwy[1],
                         facet_draw = input$facet,
                         facet_var = nazwy[2],
+<<<<<<< HEAD
                         bin = bin,
+=======
+                        bin = input$bin,
+>>>>>>> 4129f79a4421fe3ceb7c562b80c9ca6c46b0e7c8
                         y_density = input$os_y,
                         x_name = input$os_x,
                         y_name = input$os_y_nazwa,
@@ -113,7 +120,61 @@ app_server <- function( input, output, session ) {
 
     print(p)
     
+<<<<<<< HEAD
 
+=======
+    # p <- ggplot2::ggplot(wb, environment = envir)
+    # 
+    # facet = paste("~", nazwy[2])
+    # 
+    # if ( as.logical(input$facet) == TRUE){
+    #   if ( input$os_y == 2){
+    #     p <- p + ggplot2::geom_histogram(ggplot2::aes(x = eval(parse(text = nazwy[1])), y = ..density..), binwidth = input$bin) + 
+    #       ggplot2::facet_grid(facet)+ggplot2::theme_bw()+ggplot2::xlab(nazwy[1])
+    #   } else {
+    #     p <- p + ggplot2::geom_histogram(ggplot2::aes(x = eval(parse(text = nazwy[1]))), binwidth = input$bin) + 
+    #       ggplot2::facet_grid(facet)+ggplot2::theme_bw()+ggplot2::xlab(nazwy[1])
+    #   }
+    # } else {
+    #   if ( input$os_y == 2){
+    #     p <- p + ggplot2::geom_histogram(ggplot2::aes(x = eval(parse(text = nazwy[1])), y = ..density.., fill = as.factor(eval(parse(text = nazwy[2])))), 
+    #                                      position = "dodge", binwidth = input$bin)+
+    #       ggplot2::theme_bw()+ggplot2::xlab(nazwy[1])#+ggplot2::scale_fill_discrete(nazwy[2])
+    #   } else {
+    #     p <- p + ggplot2::geom_histogram(ggplot2::aes(x = eval(parse(text = nazwy[1])), fill = as.factor(eval(parse(text = nazwy[2])))), position = "dodge", 
+    #                                      binwidth = input$bin)+
+    #       ggplot2::theme_bw()+ggplot2::xlab(nazwy[1])#+ggplot2::scale_fill_discrete(nazwy[2])
+    #   }
+    #   
+    # }
+    # p <- p + ggplot2::xlab(input$os_x) + ggplot2::ylab(input$os_y_nazwa)
+    # 
+    # if(input$kolory_hist == 'domyślna'){
+    #   p <- p + ggplot2::scale_fill_discrete(name = nazwy[2])
+    # }
+    # 
+    # if(input$kolory_hist == 'viridis'){
+    #   p <- p + ggplot2::scale_fill_viridis_d(option = input$viridis_hist, end = 0.92, name = nazwy[2])
+    # }
+    # 
+    # if(input$kolory_hist == 'colorbrewer'){
+    #   p <- p + ggplot2::scale_fill_brewer(palette = input$colorbrewer_hist,  name = nazwy[2])
+    # }
+    # 
+    # if(input$kolory_hist == 'odcienie szarości'){
+    #   p <- p + ggplot2::scale_fill_grey( name = nazwy[2])
+    # }
+    # 
+    # if(input$kolory_hist == 'własna :)'){
+    #   
+    #   my_colors <- sub(' ', '', unlist(stringr::str_split(input$wlasne_kolory_hist, ',')))
+    #   
+    #   
+    #   p <- p + ggplot2::scale_fill_manual(values = my_colors,  name = nazwy[2])
+    # }
+    # 
+    # print(p)
+>>>>>>> 4129f79a4421fe3ceb7c562b80c9ca6c46b0e7c8
   })  
   
   output$histogram <- renderPlot({
