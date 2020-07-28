@@ -135,7 +135,7 @@ app_ui <- function(request) {
                                           Typ_A Typ_B;Typ_A Typ_C')
                               ),
                               radioButtons('punkty', 'Czy dodać wszystkie obserwacje?', 
-                                           c('Nie' = 'none', 'Tak (jitter)' = "jitter", 'Tak (beeswarm)' = 'beeswarm', 
+                                           c('Nie' = 'none', 'Tak (beeswarm)' = 'beeswarm', 
                                              'Tak (quasirandom)' = 'quasirandom'), 
                                            inline = TRUE),
                               conditionalPanel(condition ='input.porownanie != "brak"' ,
