@@ -83,9 +83,73 @@ draw_histogram <- function(wb, variable, facet_draw = TRUE, facet_var, bin = 1, 
 }
 
 
-draw_density <- function(){
+#' Title
+#'
+#' @param wb dataframe
+#' @param variable name for x
+#' @param color_var name for facet/colorscale
+#' @param fill add fill to density curves?
+#' @param x_name x label
+#' @param y_name y label
+#' @param kolory choose colour scale
+#' @param viridis choose viridis scale
+#' @param brewer choose colorbrewer scale
+#' @param wlasne choose custom scale
+#'
+#' @return ggplot 
+#' @export
+#'
+#' @examples
+draw_density <- function(wb, variable, color_var, fill = FALSE, x_name = 'x', y_name = 'y', kolory = 'domyślna',
+                         viridis = 'magma', brewer = 'Set1', wlasne){
 
-
+  p <- ggplot2::ggplot(wb)
+  
+  p <- p + ggplot2::geom_density(ggplot2::aes(x = eval(parse(text = variable)), color = as.factor(eval(parse(text = color_var)))))+
+    ggplot2::theme_bw()+ggplot2::xlab(variable)
+  
+  if(fill == TRUE){
+    p <- p + ggplot2::geom_density(ggplot2::aes(x = eval(parse(text = variable)), color = as.factor(eval(parse(text = color_var))),
+                                                fill = as.factor(eval(parse(text = color_var)))), alpha = 0.3)+
+      ggplot2::theme_bw()+ggplot2::xlab(variable)
+    
+    if(kolory == 'domyślna'){
+      p <- p + ggplot2::scale_fill_discrete(name = color_var)
+    }
+    if(kolory == 'viridis'){
+      p <- p + ggplot2::scale_fill_viridis_d(option = viridis, end = 0.92, name = color_var)
+    }
+    if(kolory == 'colorbrewer'){
+      p <- p + ggplot2::scale_fill_brewer(palette = brewer,  name = color_var)
+    }
+    if(kolory == 'odcienie szarości'){
+      p <- p + ggplot2::scale_fill_grey( name = color_var)
+    }
+    if(kolory == 'własna :)'){
+      my_colors <- sub(' ', '', unlist(stringr::str_split(wlasne, ',')))
+      p <- p + ggplot2::scale_fill_manual(values = my_colors,  name = color_var)
+    }
+  }
+  
+  if(kolory == 'domyślna'){
+    p <- p + ggplot2::scale_color_discrete(name = color_var)
+  }
+  if(kolory == 'viridis'){
+    p <- p + ggplot2::scale_color_viridis_d(option = viridis, end = 0.92, name = color_var)
+  }
+  if(kolory == 'colorbrewer'){
+    p <- p + ggplot2::scale_color_brewer(palette = brewer,  name = color_var)
+  }
+  if(kolory == 'odcienie szarości'){
+    p <- p + ggplot2::scale_color_grey( name = color_var)
+  }
+  if(kolory == 'własna :)'){
+    my_colors <- sub(' ', '', unlist(stringr::str_split(wlasne, ',')))
+    p <- p + ggplot2::scale_color_manual(values = my_colors,  name = color_var)
+  }
+  
+  p <- p + ggplot2::xlab(x_name) + ggplot2::ylab(y_name)
+  return(p)
 }
 
 

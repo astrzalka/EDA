@@ -90,7 +90,7 @@ app_server <- function( input, output, session ) {
     
     nazwy <- colnames(wb)
     
-
+    
     if(input$bin == 0){
       
       bin <- mean(wb[,nazwy[1]], na.rm = TRUE) / 10
@@ -111,10 +111,10 @@ app_server <- function( input, output, session ) {
                         viridis = input$viridis_hist,
                         brewer = input$colorbrewer_hist,
                         wlasne = input$wlasne_kolory_hist)
-
+    
     print(p)
     
-
+    
   })  
   
   output$histogram <- renderPlot({
@@ -138,53 +138,19 @@ app_server <- function( input, output, session ) {
     
     nazwy <- colnames(wb)
     
-    p <- ggplot2::ggplot(wb, environment = envir)
+    p <- draw_density(wb = wb,
+                      variable = nazwy[1],
+                      color_var = nazwy[2],
+                      fill = input$fill_dens,
+                      x_name = input$os_x_dens,
+                      y_name = input$os_y_dens,
+                      kolory = input$kolory_dens,
+                      viridis = input$viridis_dens,
+                      brewer = input$colorbrewer_dens,
+                      wlasne = input$wlasne_kolory_dens)
     
-    p <- p + ggplot2::geom_density(ggplot2::aes(x = eval(parse(text = nazwy[1])), color = as.factor(eval(parse(text = nazwy[2])))))+
-      ggplot2::theme_bw()+ggplot2::xlab(nazwy[1])
-    
-    if(input$fill_dens == TRUE){
-      p <- p + ggplot2::geom_density(ggplot2::aes(x = eval(parse(text = nazwy[1])), color = as.factor(eval(parse(text = nazwy[2]))),
-                                                  fill = as.factor(eval(parse(text = nazwy[2])))), alpha = 0.3)+
-        ggplot2::theme_bw()+ggplot2::xlab(nazwy[1])
-      
-      if(input$kolory_dens == 'domyślna'){
-        p <- p + ggplot2::scale_fill_discrete(name = nazwy[2])
-      }
-      if(input$kolory_dens == 'viridis'){
-        p <- p + ggplot2::scale_fill_viridis_d(option = input$viridis_dens, end = 0.92, name = nazwy[2])
-      }
-      if(input$kolory_dens == 'colorbrewer'){
-        p <- p + ggplot2::scale_fill_brewer(palette = input$colorbrewer_dens,  name = nazwy[2])
-      }
-      if(input$kolory_dens == 'odcienie szarości'){
-        p <- p + ggplot2::scale_fill_grey( name = nazwy[2])
-      }
-      if(input$kolory_dens == 'własna :)'){
-        my_colors <- sub(' ', '', unlist(stringr::str_split(input$wlasne_kolory_dens, ',')))
-        p <- p + ggplot2::scale_fill_manual(values = my_colors,  name = nazwy[2])
-      }
-    }
-    
-    if(input$kolory_dens == 'domyślna'){
-      p <- p + ggplot2::scale_color_discrete(name = nazwy[2])
-    }
-    if(input$kolory_dens == 'viridis'){
-      p <- p + ggplot2::scale_color_viridis_d(option = input$viridis_dens, end = 0.92, name = nazwy[2])
-    }
-    if(input$kolory_dens == 'colorbrewer'){
-      p <- p + ggplot2::scale_color_brewer(palette = input$colorbrewer_dens,  name = nazwy[2])
-    }
-    if(input$kolory_dens == 'odcienie szarości'){
-      p <- p + ggplot2::scale_color_grey( name = nazwy[2])
-    }
-    if(input$kolory_dens == 'własna :)'){
-      my_colors <- sub(' ', '', unlist(stringr::str_split(input$wlasne_kolory_dens, ',')))
-      p <- p + ggplot2::scale_color_manual(values = my_colors,  name = nazwy[2])
-    }
-    
-    p <- p + ggplot2::xlab(input$os_x_dens) + ggplot2::ylab(input$os_y_dens)
     print(p)
+    
   })
   
   output$density <- renderPlot({
