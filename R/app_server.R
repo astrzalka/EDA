@@ -99,7 +99,6 @@ app_server <- function( input, output, session ) {
       bin <- input$bin
     }
     
-
     p <- draw_histogram(wb = wb,
                         variable = nazwy[1],
                         facet_draw = input$facet,
