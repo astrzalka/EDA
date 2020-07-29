@@ -61,6 +61,40 @@ app_server <- function( input, output, session ) {
     return(dane)
   })
   
+  
+  final_scatter <- reactive ({
+    
+    if(input$format == FALSE){
+      dane <- dane()
+      grupy <- colnames(dane)
+      
+      numer_1 <- which(grupy == input$kolumna_scatter_x)
+      numer_2 <- which(grupy == input$kolumna_scatter_y)
+      
+      numery <- c(numer_1, numer_2)
+      
+      if(input$kolumna_scatter_color != 'brak'){
+        numer_3 <- which(grupy == input$kolumna_scatter_color)
+        numery <- c(numery, numer_3)
+      }
+      
+      if(input$kolumna_scatter_facet != 'brak'){
+        numer_4 <- which(grupy == input$kolumna_scatter_facet)
+        numery <- c(numery, numer_4)
+      }
+      
+      dane <- dane[,numery]
+    } else {
+      return(NULL)
+    }
+    
+    # dane <- dane[dane[,2] %in% input$grupy,]
+    
+    
+    
+    return(dane)
+  })
+  
   output$kolumna_var <- renderUI({
     if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
@@ -111,7 +145,7 @@ app_server <- function( input, output, session ) {
       numer_2 <- which(grupy == input$kolumna_factor)
       
       dane <- wybor(dane(), num1 = numer_1, num2 = numer_2)
-
+      
     }
     
     colnames(dane) <- c('wartosc', 'grupy')
@@ -436,6 +470,97 @@ app_server <- function( input, output, session ) {
     }
   })
   
+  output$kolumna_scatter_x <- renderUI({
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    if (input$format == TRUE){
+      return(NULL)
+    }
+    
+    dane <- dane()
+    
+    grupy <- colnames(dane)
+    
+    selectInput("kolumna_scatter_x", "Wybierz zmienną dla osi X",
+                choices = grupy, selected = grupy[1])
+    
+  })
+  
+  output$kolumna_scatter_y <- renderUI({
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    if (input$format == TRUE){
+      return(NULL)
+    }
+    
+    dane <- dane()
+    
+    grupy <- colnames(dane)
+    
+    selectInput("kolumna_scatter_y", "Wybierz zmienną dla osi Y",
+                choices = grupy, selected = grupy[2])
+    
+  })
+  
+  output$kolumna_scatter_color <- renderUI({
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    if (input$format == TRUE){
+      return(NULL)
+    }
+    
+    dane <- dane()
+    
+    grupy <- colnames(dane)
+    
+    selectInput("kolumna_scatter_color", "Pokoloruj według",
+                choices = c('brak', grupy), selected = 'brak')
+    
+  })
+  
+  output$kolumna_scatter_facet <- renderUI({
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    if (input$format == TRUE){
+      return(NULL)
+    }
+    
+    dane <- dane()
+    
+    grupy <- colnames(dane)
+    
+    selectInput("kolumna_scatter_facet", "Podziel na panele według",
+                choices = c('brak', grupy), selected = 'brak')
+    
+  })
+  
+  scatterInput <- reactive({
+    
+    wb <- final_scatter()
+    
+    nazwy <- colnames(wb)
+    
+    color <- input$kolumna_scatter_color
+    facet <- input$kolumna_scatter_facet
+    
+    p <- draw_scatter(wb = wb,
+                      x_var = nazwy[1],
+                      y_var = nazwy[2],
+                      color_var = color,
+                      facet_var = facet,
+                      trend = input$trend)
+    
+    return(p)
+    
+  })
+  
+  output$scatter <- renderPlot({
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    print(scatterInput())
+  })
+  
+  output$scatter_test <- renderTable(head(final_scatter()))
   
   
   # observe ({

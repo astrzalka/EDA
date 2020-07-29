@@ -464,4 +464,37 @@ draw_boxplot <- function(wb,
 }
 
 
+draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak', trend = FALSE){
+  
+  
+  if(color_var == 'brak'){
+  p <- ggplot2::ggplot(wb, ggplot2::aes(x = eval(parse(text = x_var)), y = eval(parse(text = y_var))))
+  } else {
+  p <- ggplot2::ggplot(wb, ggplot2::aes(x = eval(parse(text = x_var)), 
+                                        y = eval(parse(text = y_var)),
+                                        color = eval(parse(text = color_var))))
+    
+  }
+  
+  p <- p + ggplot2::geom_point()
+  
+  if(facet_var != 'brak'){
+    
+    facet <- paste0('~', facet_var)
+    
+    p <- p + ggplot2::facet_wrap(eval(parse(text = facet)))
+    
+  }
+  
+  if(trend){
+    p <- p + ggplot2::geom_smooth()
+  }
+  
+  p <- p + ggplot2::theme_bw()
+  p <- p + ggplot2::xlab(x_var) +
+    ggplot2::ylab(y_var)
+  
+  return(p)
+}
+
 

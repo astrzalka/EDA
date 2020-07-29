@@ -219,7 +219,25 @@ app_ui <- function(request) {
                                       verbatimTextOutput("anova2"),
                                       plotOutput('anova_plot'))
                           )
-                 )
+                 ),
+                 tabPanel("Scatterplot",
+                          sidebarLayout(
+                            sidebarPanel(
+                              uiOutput('kolumna_scatter_x'),
+                              uiOutput('kolumna_scatter_y'),
+                              uiOutput('kolumna_scatter_color'),
+                              uiOutput('kolumna_scatter_facet'),
+                              radioButtons('trend', 'Czy dodać linię trendu?',
+                                           choices = list("Tak" = TRUE, "Nie" = FALSE), 
+                                           selected = "FALSE", inline = TRUE)
+                              
+                            ),
+                            mainPanel(
+                              plotOutput("scatter", height = 550),
+                              tableOutput('scatter_test')
+                              
+                            )
+                          ))
                  
       )
     )
