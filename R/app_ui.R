@@ -33,15 +33,20 @@ app_ui <- function(request) {
                                          ),
                                          radioButtons("header", "Czy kolummy mają nagłówki", choices = list("Tak" = TRUE, "Nie" = FALSE), selected = TRUE, inline = TRUE),
                                          radioButtons('format', 'Czy zmienić format danych na wąski', choices = list('Tak' = TRUE, 'Nie' = FALSE), selected = FALSE, inline = TRUE),
-                                         numericInput("num1", "Numer kolumny zmiennej objaśnianej", value = 1),
-                                         numericInput("num2", "Numer kolumny zmiennej objaśniającej", value = 2),
+                                         uiOutput('kolumna_var'),
+                                         uiOutput('kolumna_factor'),
                                          uiOutput('grupy')
                                          
                                          # radioButtons('format', 'Format dokumentu', c('HTML'),
                                          #              inline = TRUE),
                                          # downloadButton('downloadReport')
                             ),
-                            mainPanel(tableOutput("contents"))
+                            mainPanel(
+                              h4('Dane wejściowe'),
+                              dataTableOutput('input_data'),
+                              h4('Dane wybrane do analizy'),
+                              dataTableOutput("contents")
+                            )
                           )
                  ),
                  tabPanel("Histogram",

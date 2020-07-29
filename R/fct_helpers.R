@@ -198,6 +198,8 @@ draw_boxplot <- function(wb,
                          brewer = 'Set1', 
                          wlasne){
   
+  wb <- wb[,c(y_var, x_var)]
+  
   if(type == 'Boxplot'){
     if(p_format == 'p.adj'){
       

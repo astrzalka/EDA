@@ -37,7 +37,13 @@ app_server <- function( input, output, session ) {
   final <- reactive ({
     
     if(input$format == FALSE){
-      dane <- wybor(dane(), input$num1, input$num2)
+      
+      grupy <- colnames(dane())
+      
+      numer_1 <- which(grupy == input$kolumna_var)
+      numer_2 <- which(grupy == input$kolumna_factor)
+      
+      dane <- wybor(dane(), num1 = numer_1, num2 = numer_2)
     } else {
       dane_2 <- dane()
       
@@ -53,6 +59,38 @@ app_server <- function( input, output, session ) {
     return(dane)
   })
   
+  output$kolumna_var <- renderUI({
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    if (input$format == TRUE){
+      return(NULL)
+    }
+    
+    dane <- dane()
+    
+    grupy <- colnames(dane)
+    
+    selectInput("kolumna_var", "Wybierz zmienną do analizy",
+                choices = grupy, selected = grupy[1])
+    
+  })
+  
+  output$kolumna_factor <- renderUI({
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    if (input$format == TRUE){
+      return(NULL)
+    }
+    
+    dane <- dane()
+    
+    grupy <- colnames(dane)
+    
+    selectInput("kolumna_factor", "Wybierz zmienną zawierającą grupy",
+                choices = grupy, selected = grupy[2])
+    
+  })
+  
   output$grupy <- renderUI({
     
     if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
@@ -65,7 +103,13 @@ app_server <- function( input, output, session ) {
       
       dane <- dane[,c(2,1)]
     } else {
-      dane <- wybor(dane(), input$num1, input$num2)
+      grupy <- colnames(dane())
+      
+      numer_1 <- which(grupy == input$kolumna_var)
+      numer_2 <- which(grupy == input$kolumna_factor)
+      
+      dane <- wybor(dane(), num1 = numer_1, num2 = numer_2)
+
     }
     
     colnames(dane) <- c('wartosc', 'grupy')
@@ -79,9 +123,13 @@ app_server <- function( input, output, session ) {
   })
   
   
-  output$contents <- renderTable({
-    final()
-  })
+  output$input_data <- renderDataTable(dane(), options = list(
+    pageLength = 5
+  ))
+  
+  output$contents <- renderDataTable(final(), options = list(
+    pageLength = 5
+  ))
   
   histogramInput <- reactive({
     
@@ -94,7 +142,8 @@ app_server <- function( input, output, session ) {
     
     if(input$bin == 0){
       
-      bin <- mean(wb[,nazwy[1]], na.rm = TRUE) / 10
+      # domyślnie zgaduje szerokość słupków do histogramu na podstawie zakresu danych
+      bin <- abs((range(wb[,nazwy[1]])[2] - range(wb[,nazwy[1]])[1])/20) 
     } else {
       
       bin <- input$bin
@@ -169,7 +218,7 @@ app_server <- function( input, output, session ) {
     })
   
   boxplotInput <- reactive({
-
+    
     wb <- final()
     wb <- as.data.frame(wb)
     nazwy <- colnames(wb)
@@ -193,7 +242,7 @@ app_server <- function( input, output, session ) {
                       wlasne = input$wlasne)
     
     return(p)
-
+    
   })
   
   output$boxplot <- renderPlot({
