@@ -24,6 +24,7 @@ app_server <- function( input, output, session ) {
       if (is.null(inFile_excel))
         return(NULL)
       d <- readxl::read_excel(path = inFile_excel$datapath, col_names = as.logical(input$header))
+      d <- as.data.frame(d) # tibble did not work in filtering later
       return(d)
     }
     
@@ -54,6 +55,7 @@ app_server <- function( input, output, session ) {
     }
     
     dane <- dane[dane[,2] %in% input$grupy,]
+    
     
     
     return(dane)
