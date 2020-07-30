@@ -3,6 +3,7 @@
 #' @param request Internal parameter for `{shiny}`. 
 #'     DO NOT REMOVE.
 #' @import shiny
+#' @import plotly
 #' @noRd
 app_ui <- function(request) {
   tagList(
@@ -267,8 +268,11 @@ app_ui <- function(request) {
                             ),
                             #mainPanel(
                             column(8,
-                                   plotOutput("scatter", height = 600),
-                                   tableOutput('scatter_test')
+                                   plotlyOutput("scatter", height = 600),
+                                   column(3,
+                                   tableOutput('scatter_test')),
+                                   column(3,
+                                   tableOutput('tabela_korelacja'))
                                    
                             ),
                             column(2,
@@ -286,8 +290,13 @@ app_ui <- function(request) {
                                      ),
                                      checkboxInput('se', 'Czy pokazać przedział ufności?', value = TRUE),
                                      numericInput('size_trend', "Podaj grubość lilnii trendu",
-                                                  value = 2, step = 0.5)
-                                   )
+                                                  value = 1, step = 0.5, min = 0)
+                                   ),
+                                   radioButtons('corr', 'Czy policzyć korelację?',
+                                                choices = list('Nie' = 'nie', 
+                                                               'Tak (pearson)' = 'pearson',
+                                                               'Tak (spearman)' = 'spearman'
+                                                               ))
                             )
                           )
                  )

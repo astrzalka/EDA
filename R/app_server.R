@@ -168,12 +168,12 @@ app_server <- function( input, output, session ) {
   ))
   
   output$summary_all <- renderUI({
-
+    
     if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
     
     summ <- print(summarytools::dfSummary(dane(), varnumbers = FALSE, valid.col = FALSE, 
-                            graph.magnif = 0.8), 
+                                          graph.magnif = 0.8), 
                   method = 'render',
                   headings = FALSE,
                   bootstrap.css = FALSE)
@@ -578,22 +578,86 @@ app_server <- function( input, output, session ) {
     
   })
   
-  output$scatter <- renderPlot({
+  output$scatter <- renderPlotly({
     if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
       return(NULL)
-    print(scatterInput())
+    pl <- scatterInput()
+    
+    # data <- final_scatter()
+    # 
+    # names <- colnames(data)
+    # 
+    # mytext <- paste0("X = ", data$names[1], "\n" , "Y = ", data$names[2], "\n")
+    
+    pl <- plotly::plotly_build(pl)   
+    
+    # pl <- plotly::style(pl , text=mytext, hoverinfo = "text")
+    
+    print(pl)
   })
   
   output$download_scatter <- downloadHandler(
     filename = function() { paste(input$dataset, '.png', sep='') },
     content = function(file) {
       png(file, res = input$res_scatter, width = input$width_scatter, input$height_scatter, unit = 'cm')
-      print(boxplotInput())
+      print(scatterInput())
       dev.off()
     })
   
-  output$scatter_test <- renderTable(head(final_scatter()))
+  output$scatter_test <- renderTable({
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    head(final_scatter())
+  })
   
+  tabela_korelacja <- reactive({
+    
+    dane <- final_scatter()
+    
+   # nazwy <- c('x', 'y')
+    
+    if(input$kolumna_scatter_color == 'brak' & input$kolumna_scatter_facet == 'brak'){
+    colnames(dane) <- c('x', 'y')
+    
+    dane %>% tidyr::nest(data = tidyr::everything()) -> nested
+    }
+    
+    if(input$kolumna_scatter_color != 'brak' & input$kolumna_scatter_facet == 'brak'){
+      colnames(dane) <- c('x', 'y', 'grupa1')
+      
+      dane %>% tidyr::nest(data = -grupa1) -> nested
+    }
+    
+    if(input$kolumna_scatter_color == 'brak' & input$kolumna_scatter_facet != 'brak'){
+      colnames(dane) <- c('x', 'y', 'grupa2')
+      
+      dane %>% tidyr::nest(data = -grupa2) -> nested
+    }
+    
+    if(input$kolumna_scatter_color != 'brak' & input$kolumna_scatter_facet != 'brak'){
+      colnames(dane) <- c('x', 'y', 'grupa1', 'grupa2')
+      
+      dane %>% tidyr::nest(data = -c(grupa1, grupa2)) -> nested
+    }
+    
+    nested %>% 
+      dplyr::mutate(test = purrr::map(data, ~ cor.test(.x$x, .x$y, method = input$corr)), # S3 list-col
+                    tidied = purrr::map(test, broom::tidy)
+      ) %>% 
+      tidyr::unnest(tidied) %>% select(-data, -test) -> wynik
+    
+    return(wynik)
+    
+  }) 
+  
+  output$tabela_korelacja <- renderTable({
+    if(input$corr == 'nie'){
+      return(NULL)
+    }
+    
+    tabela_korelacja()
+    
+  })
   
   # observe ({
   # 
