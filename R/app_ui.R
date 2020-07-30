@@ -258,16 +258,16 @@ app_ui <- function(request) {
                                    #textInput('os_x_sc', 'Nazwa osi X', 'Wartość'),
                                    #textInput('os_y_sc', 'Nazwa osi Y', 'Liczba'),
                                    #textInput('legenda_nazwa_box', 'Nazwa legendy', ''),
-                                   downloadButton('download_sc', 'Pobierz wykres'),
-                                   numericInput('width_sc', 'Szerokość obrazka [cm]', 20, min = 5, max = 25),
-                                   numericInput('height_sc', 'Wysokość obrazka [cm]', 14, min = 5, max = 25),
-                                   numericInput('res_sc', 'Rozdzielczość', 200, min = 100, max = 500)
+                                   downloadButton('download_scatter', 'Pobierz wykres'),
+                                   numericInput('width_scatter', 'Szerokość obrazka [cm]', 20, min = 5, max = 25),
+                                   numericInput('height_scatter', 'Wysokość obrazka [cm]', 14, min = 5, max = 25),
+                                   numericInput('res_scatter', 'Rozdzielczość', 200, min = 100, max = 500)
                                    
                                    
                             ),
                             #mainPanel(
                             column(8,
-                                   plotOutput("scatter", height = 550),
+                                   plotOutput("scatter", height = 600),
                                    tableOutput('scatter_test')
                                    
                             ),

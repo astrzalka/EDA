@@ -584,6 +584,14 @@ app_server <- function( input, output, session ) {
     print(scatterInput())
   })
   
+  output$download_scatter <- downloadHandler(
+    filename = function() { paste(input$dataset, '.png', sep='') },
+    content = function(file) {
+      png(file, res = input$res_scatter, width = input$width_scatter, input$height_scatter, unit = 'cm')
+      print(boxplotInput())
+      dev.off()
+    })
+  
   output$scatter_test <- renderTable(head(final_scatter()))
   
   
