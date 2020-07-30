@@ -45,7 +45,8 @@ app_ui <- function(request) {
                               h4('Dane wejściowe'),
                               dataTableOutput('input_data'),
                               h4('Dane wybrane do analizy'),
-                              dataTableOutput("contents")
+                              dataTableOutput("contents"),
+                              uiOutput('summary_all')
                             )
                           )
                  ),
@@ -188,7 +189,7 @@ app_ui <- function(request) {
                           mainPanel(tableOutput("podsum"))
                           
                  ),
-                 tabPanel("Test na dopasowanie do rozkładu normalnego",
+                 tabPanel("Test rozkładu normalnego",
                           sidebarLayout(
                             sidebarPanel(),
                             mainPanel(h4('Uwaga, rozkład nie różni się od rozkładu normalnego jeżeli wartość p jest wyższa od 0.05.'),

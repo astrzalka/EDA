@@ -160,12 +160,26 @@ app_server <- function( input, output, session ) {
   
   
   output$input_data <- renderDataTable(dane(), options = list(
-    pageLength = 5
+    pageLength = 3
   ))
   
   output$contents <- renderDataTable(final(), options = list(
-    pageLength = 5
+    pageLength = 3
   ))
+  
+  output$summary_all <- renderUI({
+
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+      return(NULL)
+    
+    summ <- print(summarytools::dfSummary(dane(), varnumbers = FALSE, valid.col = FALSE, 
+                            graph.magnif = 0.8), 
+                  method = 'render',
+                  headings = FALSE,
+                  bootstrap.css = FALSE)
+    
+    return(summ)
+  })
   
   histogramInput <- reactive({
     
