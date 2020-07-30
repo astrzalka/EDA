@@ -269,11 +269,10 @@ app_ui <- function(request) {
                             #mainPanel(
                             column(8,
                                    plotlyOutput("scatter", height = 600),
-                                   column(3,
-                                   tableOutput('scatter_test')),
-                                   column(3,
-                                   tableOutput('tabela_korelacja'))
-                                   
+                                   tableOutput('tabela_korelacja'),
+                                   tableOutput('tabela_lm'),
+                                   tableOutput('scatter_test')
+ 
                             ),
                             column(2,
                                    checkboxInput('trend', 'Czy dodać linię trendu?',
@@ -296,7 +295,7 @@ app_ui <- function(request) {
                                                 choices = list('Nie' = 'nie', 
                                                                'Tak (pearson)' = 'pearson',
                                                                'Tak (spearman)' = 'spearman'
-                                                               ))
+                                                ))
                             )
                           )
                  )

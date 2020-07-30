@@ -659,6 +659,59 @@ app_server <- function( input, output, session ) {
     
   })
   
+  
+  tabela_lm <- reactive({
+    
+    dane <- final_scatter()
+    
+    # nazwy <- c('x', 'y')
+    
+    if(input$kolumna_scatter_color == 'brak' & input$kolumna_scatter_facet == 'brak'){
+      colnames(dane) <- c('x', 'y')
+      
+      dane %>% tidyr::nest(data = tidyr::everything()) -> nested
+    }
+    
+    if(input$kolumna_scatter_color != 'brak' & input$kolumna_scatter_facet == 'brak'){
+      colnames(dane) <- c('x', 'y', 'grupa1')
+      
+      dane %>% tidyr::nest(data = -grupa1) -> nested
+    }
+    
+    if(input$kolumna_scatter_color == 'brak' & input$kolumna_scatter_facet != 'brak'){
+      colnames(dane) <- c('x', 'y', 'grupa2')
+      
+      dane %>% tidyr::nest(data = -grupa2) -> nested
+    }
+    
+    if(input$kolumna_scatter_color != 'brak' & input$kolumna_scatter_facet != 'brak'){
+      colnames(dane) <- c('x', 'y', 'grupa1', 'grupa2')
+      
+      dane %>% tidyr::nest(data = -c(grupa1, grupa2)) -> nested
+    }
+    
+    nested %>% 
+      dplyr::mutate(fit = purrr::map(data, ~ lm(x~ y, data = .x)), # S3 list-col
+                    tidied = purrr::map(fit, broom::tidy)
+      ) %>% 
+      tidyr::unnest(tidied) %>% select(-data, -fit) -> wynik
+    
+    return(wynik)
+    
+  }) 
+  
+  output$tabela_lm <- renderTable({
+    if(input$rodzaj_trend == 'lm'){
+      tabela_lm()
+    } else {
+      return(NULL)
+    }
+    
+    
+    
+  })
+  
+  
   # observe ({
   # 
   #   inFile <- input$dane
