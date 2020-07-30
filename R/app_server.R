@@ -548,7 +548,17 @@ app_server <- function( input, output, session ) {
                       y_var = nazwy[2],
                       color_var = color,
                       facet_var = facet,
-                      trend = input$trend)
+                      trend = input$trend,
+                      size_trend = input$size_trend,
+                      model = input$rodzaj_trend,
+                      span = input$span,
+                      se = input$se,
+                      alpha = input$alpha_point,
+                      size_point = input$size_point,
+                      kolory = input$kolory_scatter,
+                      viridis = input$viridis_scatter,
+                      brewer = input$colorbrewer_scatter,
+                      wlasne = input$wlasne_kolory_scatter)
     
     return(p)
     

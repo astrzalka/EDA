@@ -191,7 +191,7 @@ app_ui <- function(request) {
                  tabPanel("Test na dopasowanie do rozkładu normalnego",
                           sidebarLayout(
                             sidebarPanel(),
-                            mainPanel(h3('Uwaga, rozkład nie różni się od rozkładu normalnego jeżeli wartość p jest wyższa od 0.05.'),
+                            mainPanel(h4('Uwaga, rozkład nie różni się od rozkładu normalnego jeżeli wartość p jest wyższa od 0.05.'),
                                       tableOutput("test_nor"),
                                       plotOutput("nor_plot", height = 600))
                           )
@@ -227,9 +227,54 @@ app_ui <- function(request) {
                               uiOutput('kolumna_scatter_y'),
                               uiOutput('kolumna_scatter_color'),
                               uiOutput('kolumna_scatter_facet'),
-                              radioButtons('trend', 'Czy dodać linię trendu?',
-                                           choices = list("Tak" = TRUE, "Nie" = FALSE), 
-                                           selected = "FALSE", inline = TRUE)
+                              checkboxInput('trend', 'Czy dodać linię trendu?',
+                                           value =  FALSE),
+                              conditionalPanel(
+                                condition = "input.trend",
+                                radioButtons('rodzaj_trend', 'Wybierz rodzaj linii trendu',
+                                             choices = list('Loess' = 'loess',
+                                                            'Liniowa (lm)' = 'lm')),
+                                conditionalPanel(
+                                  condition = "input.rodzaj_trend == 'loess'",
+                                  numericInput('span', 'Wybiersz stopień dopasowania',
+                                               value = 0.75, min = 0, step = 0.05)
+                                ),
+                                checkboxInput('se', 'Czy pokazać przedział ufności?', value = TRUE),
+                                numericInput('size_trend', "Podaj grubość lilnii trendu",
+                                             value = 2, step = 0.5)
+                              ),
+                              #numericInput('alpha_point', 'Podaj zakres alpha dla punktów', value = 1, min = 0, max = 1, step = 0.1),
+                              sliderInput("alpha_point", "Podaj wartość alpha", min = 0, max = 1, value = 1, step = 0.1),
+                              sliderInput("size_point", "Podaj wielkość punktów", min = 1, max = 10, value = 2, step = 0.5),
+                              radioButtons('kolory_scatter', 'Jaką skalę kolorów zastosować?', c('domyślna', 'colorbrewer', 'viridis', 'odcienie szarości', 'własna :)'),
+                                           selected = 'domyślna', inline = TRUE),
+                              conditionalPanel(
+                                condition = "input.kolory_scatter == 'colorbrewer'",
+                                selectInput('colorbrewer_scatter', label = 'Którą skalę Colorbrewer zastosować?',
+                                            choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'),
+                                            selected = 'Set1', multiple = FALSE)
+                              ),
+                              conditionalPanel(
+                                condition = "input.kolory_scatter == 'viridis'",
+                                selectInput('viridis_scatter', label = 'Którą skalę viridis zastosować?',
+                                            choices = c('viridis', 'magma', 'plasma', 'inferno', 'cividis'),
+                                            selected = 'viridis', multiple = FALSE)
+                              ),
+                              conditionalPanel(
+                                condition = "input.kolory_scatter == 'własna :)'",
+                                textInput('wlasne_kolory_scatter', 'Tutaj wpisz wybrane nazwy kolorów oddzielając je przecinkiem. Powinny być to kolory 
+                                          predefiniowane w R (można sprawdzić jakie np. na stronie 
+                                          http://sape.inf.usi.ch/quick-reference/ggplot2/colour) albo skorzystać 
+                                          z notacji #FF0000')
+                              ),
+                              #textInput('os_x_sc', 'Nazwa osi X', 'Wartość'),
+                              #textInput('os_y_sc', 'Nazwa osi Y', 'Liczba'),
+                              #textInput('legenda_nazwa_box', 'Nazwa legendy', ''),
+                              downloadButton('download_sc', 'Pobierz wykres (dodaj .png do nazwy pliku)'),
+                              numericInput('width_sc', 'Szerokość obrazka [cm]', 20, min = 5, max = 25),
+                              numericInput('height_sc', 'Wysokość obrazka [cm]', 14, min = 5, max = 25),
+                              numericInput('res_sc', 'Rozdzielczość', 200, min = 100, max = 500)
+                              
                               
                             ),
                             mainPanel(

@@ -464,7 +464,18 @@ draw_boxplot <- function(wb,
 }
 
 
-draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak', trend = FALSE){
+draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak', 
+                         trend = FALSE,
+                         size_trend = 2, 
+                         model = 'loess', 
+                         span = 0.75, 
+                         se = TRUE, 
+                         alpha = 1, 
+                         size_point = 1.5,
+                         kolory = 'domyślna',
+                         viridis = 'magma', 
+                         brewer = 'Set1', 
+                         wlasne){
   
   
   if(color_var == 'brak'){
@@ -476,7 +487,7 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak
     
   }
   
-  p <- p + ggplot2::geom_point()
+  p <- p + ggplot2::geom_point(alpha = alpha, size = size_point)
   
   if(facet_var != 'brak'){
     
@@ -487,7 +498,31 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak
   }
   
   if(trend){
-    p <- p + ggplot2::geom_smooth()
+    p <- p + ggplot2::geom_smooth(size = size_trend,
+                                  method = model,
+                                  span = span,
+                                  se = se)
+  }
+  
+
+  if(kolory == 'viridis'){
+    p <- p + ggplot2::scale_color_viridis_d(option = viridis, end = 0.9)
+  }
+  
+  if(kolory == 'colorbrewer'){
+    p <- p + ggplot2::scale_color_brewer(palette = brewer)
+  }
+  
+  if(kolory == 'odcienie szarości'){
+    p <- p + ggplot2::scale_color_grey()
+  }
+  
+  if(kolory == 'własna :)'){
+    
+    my_colors <- sub(' ', '', unlist(stringr::str_split(wlasne, ',')))
+    
+    
+    p <- p + ggplot2::scale_color_manual(values = my_colors)
   }
   
   p <- p + ggplot2::theme_bw()
