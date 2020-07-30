@@ -28,6 +28,7 @@ usethis::use_package( "Hmisc" )
 usethis::use_package( "userfriendlyscience" )
 usethis::use_package( "shinythemes" )
 usethis::use_package( "broom" )
+usethis::use_package( "summarytools" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/
