@@ -16,7 +16,9 @@ app_server <- function( input, output, session ) {
         # d <- przyklad
         # return(d)
         return(NULL)
-      d <- read.table(inFile$datapath, header=as.logical(input$header), fill = TRUE, sep = input$sep, quote = "\"")
+      d <- data.table::rbindlist(lapply(input$dane$datapath, read.table),
+                                 use.names = TRUE, fill = TRUE)
+      #d <- read.table(inFile$datapath, header=as.logical(input$header), fill = TRUE, sep = input$sep, quote = "\"")
       return(d)
     }
     if(input$rodzaj_dane == 'excel'){

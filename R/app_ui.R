@@ -19,7 +19,8 @@ app_ui <- function(request) {
                                          radioButtons('rodzaj_dane', 'Jakie dane chcesz wczytać?', c('txt', 'excel', 'przykład'), inline = TRUE),
                                          conditionalPanel(condition = 'input.rodzaj_dane == "txt"',
                                                           fileInput("dane", 'Wybierz plik .txt',
-                                                                    accept=c('.txt'))
+                                                                    accept=c('.txt'), 
+                                                                    multiple = TRUE)
                                          ),
                                          conditionalPanel(condition = 'input.rodzaj_dane == "excel"',
                                                           fileInput('dane_xls', 'Wybierz plik excel')
