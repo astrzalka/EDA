@@ -223,7 +223,7 @@ draw_boxplot <- function(wb,
       }
       
       if(porownanie == 'grupy'){
-         
+        
         
         my_comparisons <- stringr::str_split(grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
@@ -258,7 +258,7 @@ draw_boxplot <- function(wb,
       }
       
       if(porownanie == 'grupy'){
-         
+        
         
         my_comparisons <- stringr::str_split( grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
@@ -295,7 +295,7 @@ draw_boxplot <- function(wb,
       }
       
       if(porownanie == 'grupy'){
-         
+        
         
         my_comparisons <- stringr::str_split( grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
@@ -330,7 +330,7 @@ draw_boxplot <- function(wb,
       }
       
       if(porownanie == 'grupy'){
-         
+        
         
         my_comparisons <- stringr::str_split( grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
@@ -349,7 +349,7 @@ draw_boxplot <- function(wb,
     
     
     if(p_format == 'p.adj'){
-
+      
       if(porownanie == 'brak'){
         p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = x_var, y = y_var,
                                  color = x_var,
@@ -363,11 +363,11 @@ draw_boxplot <- function(wb,
                                  xlab = x_name, ylab = y_name)
         p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.adj..),
                                             method = test_type, ref.group = grupy[kontrola])
-
+        
       }
       
       if(porownanie == 'grupy'){
-         
+        
         my_comparisons <- stringr::str_split( grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
         
@@ -376,7 +376,7 @@ draw_boxplot <- function(wb,
                                  xlab = x_name, ylab = y_name)
         p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
                                             method = test_type, comparisons = my_comparisons)
-
+        
       }
       
     }
@@ -388,7 +388,7 @@ draw_boxplot <- function(wb,
         p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = x_var, y = y_var,
                                  color = x_var,
                                  xlab = x_name, ylab = y_name)
-
+        
       }
       
       if(porownanie == 'kontrola'){
@@ -403,7 +403,7 @@ draw_boxplot <- function(wb,
       }
       
       if(porownanie == 'grupy'){
-         
+        
         
         my_comparisons <- stringr::str_split( grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
@@ -413,7 +413,7 @@ draw_boxplot <- function(wb,
                                  xlab = x_name, ylab = y_name)
         p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
                                             method = test_type, comparisons = my_comparisons)
-
+        
       }
       
     }
@@ -464,6 +464,29 @@ draw_boxplot <- function(wb,
 }
 
 
+#' Title
+#'
+#' @param wb data frame
+#' @param x_var x axis variable
+#' @param y_var y axis variable
+#' @param color_var color variable
+#' @param facet_var facet_wrap variable
+#' @param trend add trendline?
+#' @param size_trend size of trend line
+#' @param model model, option: 'loess', 'lm'
+#' @param span span of loess
+#' @param se add error?
+#' @param alpha alpha of points
+#' @param size_point size of points
+#' @param kolory color type
+#' @param viridis viridis scale
+#' @param brewer colorbrewer scale
+#' @param wlasne custom colors
+#'
+#' @return ggplot
+#' @export
+#'
+#' @examples
 draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak', 
                          trend = FALSE,
                          size_trend = 2, 
@@ -479,11 +502,11 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak
   
   
   if(color_var == 'brak'){
-  p <- ggplot2::ggplot(wb, ggplot2::aes(x = eval(parse(text = x_var)), y = eval(parse(text = y_var))))
+    p <- ggplot2::ggplot(wb, ggplot2::aes(x = eval(parse(text = x_var)), y = eval(parse(text = y_var))))
   } else {
-  p <- ggplot2::ggplot(wb, ggplot2::aes(x = eval(parse(text = x_var)), 
-                                        y = eval(parse(text = y_var)),
-                                        color = eval(parse(text = color_var))))
+    p <- ggplot2::ggplot(wb, ggplot2::aes(x = eval(parse(text = x_var)), 
+                                          y = eval(parse(text = y_var)),
+                                          color = eval(parse(text = color_var))))
     
   }
   
@@ -504,13 +527,21 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak
                                   se = se)
   }
   
-
+  numer_color_var <- which(colnames(wb) == color_var)
   if(kolory == 'viridis'){
-    p <- p + ggplot2::scale_color_viridis_d(option = viridis, end = 0.9)
+    if(is.numeric(wb[,numer_color_var])){
+      p <- p + ggplot2::scale_color_viridis_c(option = viridis, end = 0.9, name = color_var)
+    } else {
+      p <- p + ggplot2::scale_color_viridis_d(option = viridis, end = 0.9, name = color_var)
+    }
   }
   
   if(kolory == 'colorbrewer'){
-    p <- p + ggplot2::scale_color_brewer(palette = brewer)
+    if(is.numeric(wb[,numer_color_var])){
+      p <- p + ggplot2::scale_color_distiller(palette = brewer, name = color_var)
+    } else {
+      p <- p + ggplot2::scale_color_brewer(palette = brewer, name = color_var)
+    }
   }
   
   if(kolory == 'odcienie szarości'){
@@ -522,7 +553,16 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak
     my_colors <- sub(' ', '', unlist(stringr::str_split(wlasne, ',')))
     
     
-    p <- p + ggplot2::scale_color_manual(values = my_colors)
+    p <- p + ggplot2::scale_color_manual(values = my_colors, name = color_var)
+  }
+  
+  if(kolory == 'domyślna'){
+    if(is.numeric(wb[,numer_color_var])){
+      p <- p + ggplot2::scale_color_gradient(name = color_var)
+    } else {
+      p <- p + ggplot2::scale_color_discrete(name = color_var)
+    }
+
   }
   
   p <- p + ggplot2::theme_bw()
