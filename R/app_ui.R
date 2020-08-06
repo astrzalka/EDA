@@ -63,7 +63,9 @@ app_ui <- function(request) {
                               conditionalPanel(
                                 condition = "input.kolory_hist == 'colorbrewer'",
                                 selectInput('colorbrewer_hist', label = 'Którą skalę Colorbrewer zastosować?',
-                                            choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'),
+                                            choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent',
+                                                        'Spectral' ,'RdYlGn','RdYlBu','RdBu', 'PuOr','PRGn','PiYG', 'YlOrRd','YlGnBu',
+                                                        'PuBuGn','Blues', 'YlGn', 'Reds', 'RdPu', 'Purples', 'OrRd', 'GnBu' ),
                                             selected = 'Set1', multiple = FALSE)
                               ),
                               conditionalPanel(
@@ -100,7 +102,9 @@ app_ui <- function(request) {
                               conditionalPanel(
                                 condition = "input.kolory_dens == 'colorbrewer'",
                                 selectInput('colorbrewer_dens', label = 'Którą skalę Colorbrewer zastosować?',
-                                            choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'),
+                                            choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent',
+                                                        'Spectral' ,'RdYlGn','RdYlBu','RdBu', 'PuOr','PRGn','PiYG', 'YlOrRd','YlGnBu',
+                                                        'PuBuGn','Blues', 'YlGn', 'Reds', 'RdPu', 'Purples', 'OrRd', 'GnBu' ),
                                             selected = 'Set1', multiple = FALSE)
                               ),
                               conditionalPanel(
@@ -159,7 +163,9 @@ app_ui <- function(request) {
                               conditionalPanel(
                                 condition = "input.kolory == 'colorbrewer'",
                                 selectInput('colorbrewer', label = 'Którą skalę Colorbrewer zastosować?',
-                                            choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'),
+                                            choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent',
+                                                        'Spectral' ,'RdYlGn','RdYlBu','RdBu', 'PuOr','PRGn','PiYG', 'YlOrRd','YlGnBu',
+                                                        'PuBuGn','Blues', 'YlGn', 'Reds', 'RdPu', 'Purples', 'OrRd', 'GnBu' ),
                                             selected = 'Set1', multiple = FALSE)
                               ),
                               conditionalPanel(
@@ -241,8 +247,10 @@ app_ui <- function(request) {
                                    conditionalPanel(
                                      condition = "input.kolory_scatter == 'colorbrewer'",
                                      selectInput('colorbrewer_scatter', label = 'Którą skalę Colorbrewer zastosować?',
-                                                 choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent'),
-                                                 selected = 'Set1', multiple = FALSE)
+                                                 choices = c('Set1', 'Set2', 'Set3', 'Pastel1', 'Pastel2', 'Paired', 'Dark2', 'Accent',
+                                                             'Spectral' ,'RdYlGn','RdYlBu','RdBu', 'PuOr','PRGn','PiYG', 'YlOrRd','YlGnBu',
+                                                             'PuBuGn','Blues', 'YlGn', 'Reds', 'RdPu', 'Purples', 'OrRd', 'GnBu' ),
+                                                 selected = 'Spectral', multiple = FALSE)
                                    ),
                                    conditionalPanel(
                                      condition = "input.kolory_scatter == 'viridis'",

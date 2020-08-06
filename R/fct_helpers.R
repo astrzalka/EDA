@@ -530,7 +530,7 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak
   numer_color_var <- which(colnames(wb) == color_var)
   if(kolory == 'viridis'){
     if(is.numeric(wb[,numer_color_var])){
-      p <- p + ggplot2::scale_color_viridis_c(option = viridis, end = 0.9, name = color_var)
+      p <- p + ggplot2::scale_color_viridis_c(option = viridis, name = color_var)
     } else {
       p <- p + ggplot2::scale_color_viridis_d(option = viridis, end = 0.9, name = color_var)
     }
