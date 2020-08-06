@@ -693,7 +693,7 @@ app_server <- function( input, output, session ) {
     }
     
     nested %>% 
-      dplyr::mutate(fit = purrr::map(data, ~ lm(x~ y, data = .x)), # S3 list-col
+      dplyr::mutate(fit = purrr::map(data, ~ lm(y~ x, data = .x)), # S3 list-col
                     tidied = purrr::map(fit, broom::tidy)
       ) %>% 
       tidyr::unnest(tidied) %>% select(-data, -fit) -> wynik
@@ -711,7 +711,8 @@ app_server <- function( input, output, session ) {
     
     
     
-  })
+  },
+  digits = -3)
   
   
   # observe ({
