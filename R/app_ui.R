@@ -233,7 +233,7 @@ app_ui <- function(request) {
                           #sidebarLayout(
                           #sidebarPanel(
                           fluidRow(
-                            column(2,
+                            column(2, style = "background-color: #f8f9fa;",
                                    uiOutput('kolumna_scatter_x'),
                                    uiOutput('kolumna_scatter_y'),
                                    uiOutput('kolumna_scatter_color'),
@@ -283,7 +283,7 @@ app_ui <- function(request) {
                                    tableOutput('scatter_test')
  
                             ),
-                            column(2,
+                            column(2, style = "background-color: #f8f9fa;",
                                    checkboxInput('trend', 'Czy dodać linię trendu?',
                                                  value =  FALSE),
                                    conditionalPanel(
