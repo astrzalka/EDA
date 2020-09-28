@@ -30,7 +30,7 @@ app_server <- function( input, output, session ) {
       return(d)
     }
     
-    if(input$rodzaj_dane == 'przykład'){
+    if(input$rodzaj_dane == 'example'){
       d <- przyklad
       return(d)
     }
@@ -75,12 +75,12 @@ app_server <- function( input, output, session ) {
       
       numery <- c(numer_1, numer_2)
       
-      if(input$kolumna_scatter_color != 'brak'){
+      if(input$kolumna_scatter_color != 'none'){
         numer_3 <- which(grupy == input$kolumna_scatter_color)
         numery <- c(numery, numer_3)
       }
       
-      if(input$kolumna_scatter_facet != 'brak'){
+      if(input$kolumna_scatter_facet != 'none'){
         numer_4 <- which(grupy == input$kolumna_scatter_facet)
         numery <- c(numery, numer_4)
       }
@@ -98,7 +98,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$kolumna_var <- renderUI({
-    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     if (input$format == TRUE){
       return(NULL)
@@ -108,13 +108,13 @@ app_server <- function( input, output, session ) {
     
     grupy <- colnames(dane)
     
-    selectInput("kolumna_var", "Wybierz zmienną do analizy",
+    selectInput("kolumna_var", "Choose variable for analysis",
                 choices = grupy, selected = grupy[1])
     
   })
   
   output$kolumna_factor <- renderUI({
-    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     if (input$format == TRUE){
       return(NULL)
@@ -124,14 +124,14 @@ app_server <- function( input, output, session ) {
     
     grupy <- colnames(dane)
     
-    selectInput("kolumna_factor", "Wybierz zmienną zawierającą grupy",
+    selectInput("kolumna_factor", "Choose group column",
                 choices = grupy, selected = grupy[2])
     
   })
   
   output$grupy <- renderUI({
     
-    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     
     if(input$format == TRUE){
@@ -154,7 +154,7 @@ app_server <- function( input, output, session ) {
     
     grupy <- unique(dane$grupy)
     
-    checkboxGroupInput("grupy", label = ("Wybierz grupy do analizy"), 
+    checkboxGroupInput("grupy", label = ("Filter groups for analysis"), 
                        choices = grupy,
                        selected = grupy)
     
@@ -171,7 +171,7 @@ app_server <- function( input, output, session ) {
   
   output$summary_all <- renderUI({
     
-    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     
     summ <- print(summarytools::dfSummary(dane(), varnumbers = FALSE, valid.col = FALSE, 
@@ -220,7 +220,7 @@ app_server <- function( input, output, session ) {
   })  
   
   output$histogram <- renderPlot({
-    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     print(histogramInput())
   })
@@ -256,7 +256,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$density <- renderPlot({
-    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     print(densityInput())
   })
@@ -298,7 +298,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$boxplot <- renderPlot({
-    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     print(boxplotInput())
   })
@@ -314,7 +314,7 @@ app_server <- function( input, output, session ) {
   
   output$podsum <- renderTable({
     
-    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     
     dane <- final()
@@ -323,16 +323,16 @@ app_server <- function( input, output, session ) {
     
     envir <- environment()
     
-    colnames(dane)[2] <- 'grupy'
+    colnames(dane)[2] <- 'group'
     
-    dane %>% dplyr::group_by(grupy) %>% 
-      dplyr::summarise(średnia = round(mean(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
-                        mediana = round(median(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
-                        odchylenie = round(sd(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
-                        minimum = round(min(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
-                        maximum = round(max(eval(parse(text = nazwy[1])), na.rm = TRUE),2), 
+    dane %>% dplyr::group_by(group) %>% 
+      dplyr::summarise(Mean = round(mean(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                        Median = round(median(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                        SD = round(sd(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                        Minimum = round(min(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                        Maximum = round(max(eval(parse(text = nazwy[1])), na.rm = TRUE),2), 
                         n = length(eval(parse(text = nazwy[1]))),
-                        przed.ufnosci.nor = round(1.96 * (odchylenie/sqrt(n)),2))
+                        nor.conf.interval = round(1.96 * (SD/sqrt(n)),2))
     
   })
   
@@ -364,13 +364,13 @@ app_server <- function( input, output, session ) {
     
     nazwy <- colnames(dane)
     
-    colnames(dane) <- c('wartosc', 'grupy')
+    colnames(dane) <- c('value', 'group')
     
-    p <- ggpubr::ggqqplot(dane, "wartosc")
+    p <- ggpubr::ggqqplot(dane, "value")
     
-    p <- p + ggplot2::facet_wrap(~grupy)+
+    p <- p + ggplot2::facet_wrap(~group)+
       ggplot2::theme_bw()+
-      ggplot2::theme(aspect.ratio = 1) # makes the plots to be always square
+      ggplot2::theme(aspect.ratio = 1) # makes the plots square
     
     print(p)
     
@@ -378,14 +378,14 @@ app_server <- function( input, output, session ) {
   
   
   output$nor_plot <- renderPlot({
-    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     print(normality_plot())
   })
   
   
   output$ttest <- renderTable({
-    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     
     dane <- final()
@@ -398,7 +398,7 @@ app_server <- function( input, output, session ) {
   digits = -1)
   
   output$wtest <- renderTable({
-    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     
     dane <- final()
@@ -410,7 +410,7 @@ app_server <- function( input, output, session ) {
   digits = -1)
   
   output$anova1 <- renderPrint({
-    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     
     dane <- final()
@@ -424,7 +424,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$anova2 <- renderPrint({
-    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     
     dane <- final()
@@ -454,7 +454,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$anova_plot <- renderPlot({
-    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     
     if(input$posthoc == TRUE){
@@ -478,16 +478,16 @@ app_server <- function( input, output, session ) {
         ggplot2::geom_hline(yintercept = 0)+
         ggplot2::geom_errorbar(width = 0.2) + 
         ggplot2::theme_bw()+
-        ggplot2::ggtitle('95 % przedział ufności')+
-        ggplot2::ylab('Różnica średnich poziomach zmiennych') + 
-        ggplot2::xlab('Zmienna')
+        ggplot2::ggtitle('95 % confidence interval')+
+        ggplot2::ylab('') + 
+        ggplot2::xlab('Variable')
       
       print(p)
     }
   })
   
   output$kolumna_scatter_x <- renderUI({
-    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     if (input$format == TRUE){
       return(NULL)
@@ -497,13 +497,13 @@ app_server <- function( input, output, session ) {
     
     grupy <- colnames(dane)
     
-    selectInput("kolumna_scatter_x", "Wybierz zmienną dla osi X",
+    selectInput("kolumna_scatter_x", "Choose X axis variable",
                 choices = grupy, selected = grupy[1])
     
   })
   
   output$kolumna_scatter_y <- renderUI({
-    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     if (input$format == TRUE){
       return(NULL)
@@ -513,13 +513,13 @@ app_server <- function( input, output, session ) {
     
     grupy <- colnames(dane)
     
-    selectInput("kolumna_scatter_y", "Wybierz zmienną dla osi Y",
+    selectInput("kolumna_scatter_y", "Choose Y axis variable",
                 choices = grupy, selected = grupy[2])
     
   })
   
   output$kolumna_scatter_color <- renderUI({
-    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     if (input$format == TRUE){
       return(NULL)
@@ -529,13 +529,13 @@ app_server <- function( input, output, session ) {
     
     grupy <- colnames(dane)
     
-    selectInput("kolumna_scatter_color", "Pokoloruj według",
-                choices = c('brak', grupy), selected = 'brak')
+    selectInput("kolumna_scatter_color", "Color by?",
+                choices = c('none', grupy), selected = 'none')
     
   })
   
   output$kolumna_scatter_facet <- renderUI({
-    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     if (input$format == TRUE){
       return(NULL)
@@ -545,8 +545,8 @@ app_server <- function( input, output, session ) {
     
     grupy <- colnames(dane)
     
-    selectInput("kolumna_scatter_facet", "Podziel na panele według",
-                choices = c('brak', grupy), selected = 'brak')
+    selectInput("kolumna_scatter_facet", "Divide into panels by",
+                choices = c('none', grupy), selected = 'none')
     
   })
   
@@ -581,7 +581,7 @@ app_server <- function( input, output, session ) {
   })
   
   output$scatter <- renderPlotly({
-    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     pl <- scatterInput()
     
@@ -607,7 +607,7 @@ app_server <- function( input, output, session ) {
     })
   
   output$scatter_test <- renderTable({
-    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'przykład')
+    if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
     head(final_scatter())
   })
@@ -646,7 +646,7 @@ app_server <- function( input, output, session ) {
       dplyr::mutate(test = purrr::map(data, ~ cor.test(.x$x, .x$y, method = input$corr)), # S3 list-col
                     tidied = purrr::map(test, broom::tidy)
       ) %>% 
-      tidyr::unnest(tidied) %>% select(-data, -test) -> wynik
+      tidyr::unnest(tidied) %>% dplyr::select(-data, -test) -> wynik
     
     return(wynik)
     
@@ -696,7 +696,7 @@ app_server <- function( input, output, session ) {
       dplyr::mutate(fit = purrr::map(data, ~ lm(y~ x, data = .x)), # S3 list-col
                     tidied = purrr::map(fit, broom::tidy)
       ) %>% 
-      tidyr::unnest(tidied) %>% select(-data, -fit) -> wynik
+      tidyr::unnest(tidied) %>% dplyr::select(-data, -fit) -> wynik
     
     return(wynik)
     

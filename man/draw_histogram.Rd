@@ -13,7 +13,7 @@ draw_histogram(
   y_density = 1,
   x_name = "x",
   y_name = "y",
-  kolory = "domyślna",
+  kolory = "default",
   viridis = "magma",
   brewer = "Set1",
   wlasne

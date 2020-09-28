@@ -25,7 +25,7 @@ wybor <- function(dane, num1, num2){
 #' @export
 #'
 #' @examples
-draw_histogram <- function(wb, variable, facet_draw = TRUE, facet_var, bin = 1, y_density = 1, x_name = 'x', y_name = 'y', kolory = 'domyślna',
+draw_histogram <- function(wb, variable, facet_draw = TRUE, facet_var, bin = 1, y_density = 1, x_name = 'x', y_name = 'y', kolory = 'default',
                            viridis = 'magma', brewer = 'Set1', wlasne){
   
   
@@ -55,7 +55,7 @@ draw_histogram <- function(wb, variable, facet_draw = TRUE, facet_var, bin = 1, 
   }
   p <- p + ggplot2::xlab(x_name) + ggplot2::ylab(y_name)
   
-  if(kolory == 'domyślna'){
+  if(kolory == 'default'){
     p <- p + ggplot2::scale_fill_discrete(name = facet_var)
   }
   
@@ -67,11 +67,11 @@ draw_histogram <- function(wb, variable, facet_draw = TRUE, facet_var, bin = 1, 
     p <- p + ggplot2::scale_fill_brewer(palette = brewer,  name = facet_var)
   }
   
-  if(kolory == 'odcienie szarości'){
+  if(kolory == 'grayscale'){
     p <- p + ggplot2::scale_fill_grey( name = facet_var)
   }
   
-  if(kolory == 'własna :)'){
+  if(kolory == 'custom'){
     
     my_colors <- sub(' ', '', unlist(stringr::str_split(wlasne, ',')))
     
@@ -101,7 +101,7 @@ draw_histogram <- function(wb, variable, facet_draw = TRUE, facet_var, bin = 1, 
 #'
 #' @examples
 draw_density <- function(wb, variable, color_var, fill = FALSE, x_name = 'x', y_name = 'y', 
-                         kolory = 'domyślna',
+                         kolory = 'default',
                          viridis = 'magma', brewer = 'Set1', wlasne){
   
   p <- ggplot2::ggplot(wb)
@@ -114,7 +114,7 @@ draw_density <- function(wb, variable, color_var, fill = FALSE, x_name = 'x', y_
                                                 fill = as.factor(eval(parse(text = color_var)))), alpha = 0.3)+
       ggplot2::theme_bw()+ggplot2::xlab(variable)
     
-    if(kolory == 'domyślna'){
+    if(kolory == 'default'){
       p <- p + ggplot2::scale_fill_discrete(name = color_var)
     }
     if(kolory == 'viridis'){
@@ -123,16 +123,16 @@ draw_density <- function(wb, variable, color_var, fill = FALSE, x_name = 'x', y_
     if(kolory == 'colorbrewer'){
       p <- p + ggplot2::scale_fill_brewer(palette = brewer,  name = color_var)
     }
-    if(kolory == 'odcienie szarości'){
+    if(kolory == 'grayscale'){
       p <- p + ggplot2::scale_fill_grey( name = color_var)
     }
-    if(kolory == 'własna :)'){
+    if(kolory == 'custom'){
       my_colors <- sub(' ', '', unlist(stringr::str_split(wlasne, ',')))
       p <- p + ggplot2::scale_fill_manual(values = my_colors,  name = color_var)
     }
   }
   
-  if(kolory == 'domyślna'){
+  if(kolory == 'default'){
     p <- p + ggplot2::scale_color_discrete(name = color_var)
   }
   if(kolory == 'viridis'){
@@ -141,10 +141,10 @@ draw_density <- function(wb, variable, color_var, fill = FALSE, x_name = 'x', y_
   if(kolory == 'colorbrewer'){
     p <- p + ggplot2::scale_color_brewer(palette = brewer,  name = color_var)
   }
-  if(kolory == 'odcienie szarości'){
+  if(kolory == 'grayscale'){
     p <- p + ggplot2::scale_color_grey( name = color_var)
   }
-  if(kolory == 'własna :)'){
+  if(kolory == 'custom'){
     my_colors <- sub(' ', '', unlist(stringr::str_split(wlasne, ',')))
     p <- p + ggplot2::scale_color_manual(values = my_colors,  name = color_var)
   }
@@ -193,7 +193,7 @@ draw_boxplot <- function(wb,
                          grupy_porownania = '',
                          x_name = 'x', 
                          y_name = 'y', 
-                         kolory = 'domyślna',
+                         kolory = 'default',
                          viridis = 'magma', 
                          brewer = 'Set1', 
                          wlasne){
@@ -445,11 +445,11 @@ draw_boxplot <- function(wb,
     p <- p + ggplot2::scale_color_brewer(palette = brewer)
   }
   
-  if(kolory == 'odcienie szarości'){
+  if(kolory == 'grayscale'){
     p <- p + ggplot2::scale_color_grey()
   }
   
-  if(kolory == 'własna :)'){
+  if(kolory == 'custom'){
     
     my_colors <- sub(' ', '', unlist(stringr::str_split(wlasne, ',')))
     
@@ -487,7 +487,7 @@ draw_boxplot <- function(wb,
 #' @export
 #'
 #' @examples
-draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak', 
+draw_scatter <- function(wb, x_var, y_var, color_var = 'none', facet_var = 'none', 
                          trend = FALSE,
                          size_trend = 2, 
                          model = 'loess', 
@@ -495,13 +495,13 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak
                          se = TRUE, 
                          alpha = 1, 
                          size_point = 1.5,
-                         kolory = 'domyślna',
+                         kolory = 'default',
                          viridis = 'magma', 
                          brewer = 'Set1', 
                          wlasne){
   
   
-  if(color_var == 'brak'){
+  if(color_var == 'none'){
     p <- ggplot2::ggplot(wb, ggplot2::aes(x = eval(parse(text = x_var)), y = eval(parse(text = y_var))))
   } else {
     p <- ggplot2::ggplot(wb, ggplot2::aes(x = eval(parse(text = x_var)), 
@@ -512,7 +512,7 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak
   
   p <- p + ggplot2::geom_point(alpha = alpha, size = size_point)
   
-  if(facet_var != 'brak'){
+  if(facet_var != 'none'){
     
     facet <- paste0('~', facet_var)
     
@@ -544,11 +544,11 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak
     }
   }
   
-  if(kolory == 'odcienie szarości'){
+  if(kolory == 'grayscale'){
     p <- p + ggplot2::scale_color_grey()
   }
   
-  if(kolory == 'własna :)'){
+  if(kolory == 'custom'){
     
     my_colors <- sub(' ', '', unlist(stringr::str_split(wlasne, ',')))
     
@@ -556,7 +556,7 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'brak', facet_var = 'brak
     p <- p + ggplot2::scale_color_manual(values = my_colors, name = color_var)
   }
   
-  if(kolory == 'domyślna'){
+  if(kolory == 'default'){
     if(is.numeric(wb[,numer_color_var])){
       p <- p + ggplot2::scale_color_gradient(name = color_var)
     } else {

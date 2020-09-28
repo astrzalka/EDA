@@ -18,7 +18,7 @@ draw_boxplot(
   grupy_porownania = "",
   x_name = "x",
   y_name = "y",
-  kolory = "domyślna",
+  kolory = "default",
   viridis = "magma",
   brewer = "Set1",
   wlasne
