@@ -132,7 +132,10 @@ app_ui <- function(request) {
                           sidebarLayout(
                             sidebarPanel(
                               radioButtons('boxviolin', 'Choose plot type', 
-                                           c('Boxplot' = 'Boxplot', 'Violin' = 'Violin', 'Mean with confidence intervals' = 'mean_ci'), 
+                                           c('Boxplot' = 'Boxplot', 'Violin' = 'Violin'
+                                             #, 
+                                             #'Mean with confidence intervals' = 'mean_ci'
+                                             ), 
                                            inline = TRUE),
                               radioButtons('porownanie', 'Choose comparison type (for p-value display)', 
                                            list('None' = 'brak', 'Against control' = 'kontrola', 

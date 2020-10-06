@@ -573,3 +573,12 @@ draw_scatter <- function(wb, x_var, y_var, color_var = 'none', facet_var = 'none
 }
 
 
+mean_ci <- function (x, ci = 0.95, error.limit = "both") {
+  length <- base::sum(!is.na(x))
+  sd = stats::sd(x, na.rm = TRUE)
+  se <- sd/sqrt(length)
+  .mean <- base::mean(x, na.rm = TRUE)
+  ci <- stats::qt(ci/2 + 0.5, length - 1) * se
+  data.frame(y = .mean, ymin = .mean - ci, ymax = .mean + ci) %>% 
+    .format_error(error.limit)
+}
