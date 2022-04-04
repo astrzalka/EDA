@@ -293,7 +293,7 @@ app_server <- function( input, output, session ) {
                       kolory = input$kolory,
                       viridis = input$viridis,
                       brewer = input$colorbrewer,
-                      wlasne = input$wlasne)
+                      wlasne = input$wlasne_kolory)
     
     return(p)
     
