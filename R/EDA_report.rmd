@@ -1,0 +1,230 @@
+---
+title: "EDA report"
+output: 
+  html_document: 
+    toc: yes
+date: '2022-06-06'
+params:
+  data: NULL
+  facet: NULL
+  os_y: NULL
+  os_x: NULL
+  os_y_nazwa: NULL
+  kolory_hist: NULL
+  viridis_hist: NULL
+  colorbrewer_hist: NULL
+  wlasne_kolory_hist: NULL
+  bin: NULL
+  fill_dens: NULL
+  os_x_dens: NULL
+  os_y_dens: NULL
+  kolory_dens: NULL
+  viridis_dens: NULL
+  colorbrewer_dens: NULL
+  wlasne_kolory_dens: NULL
+  boxviolin: NULL
+  p_format: NULL
+  porownanie: NULL
+  punkty: NULL
+  anova: NULL
+  rodzaj_test: NULL
+  kontrola: NULL
+  porownania: NULL
+  os_x_box: NULL
+  os_y_box: NULL
+  kolory: NULL
+  viridis: NULL
+  colorbrewer: NULL
+  wlasne_kolory: NULL
+---
+
+# EDA 
+
+## Summary of data
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+dane <- params$data
+
+summary(dane)
+
+table(dane[,2])
+
+```
+
+## Histogram
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+
+nazwy <- colnames(dane)
+
+
+if(params$bin == 0){
+  
+  # domyślnie zgaduje szerokość słupków do histogramu na podstawie zakresu danych
+  bin <- abs((range(dane[,nazwy[1]])[2] - range(dane[,nazwy[1]])[1])/20) 
+} else {
+  
+  bin <- params$bin
+}
+
+p <- draw_histogram(wb = dane,
+                    variable = nazwy[1],
+                    facet_draw = params$facet,
+                    facet_var = nazwy[2],
+                    bin = bin,
+                    y_density = params$os_y,
+                    x_name = params$os_x,
+                    y_name = params$os_y_nazwa,
+                    kolory = params$kolory_hist,
+                    viridis = params$viridis_hist,
+                    brewer = params$colorbrewer_hist,
+                    wlasne = params$wlasne_kolory_hist)
+
+print(p)
+
+```
+
+## Density plot
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+p <- draw_density(wb = dane,
+                  variable = nazwy[1],
+                  color_var = nazwy[2],
+                  fill = params$fill_dens,
+                  x_name = params$os_x_dens,
+                  y_name = params$os_y_dens,
+                  kolory = params$kolory_dens,
+                  viridis = params$viridis_dens,
+                  brewer = params$colorbrewer_dens,
+                  wlasne = params$wlasne_kolory_dens)
+
+print(p)
+
+```
+
+
+
+## Boxplot
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+
+dane <- as.data.frame(dane)
+nazwy <- colnames(dane)
+
+p <- draw_boxplot(wb = dane,
+                  x_var = nazwy[2],
+                  y_var = nazwy[1],
+                  type = params$boxviolin,
+                  p_format = params$p_format,
+                  porownanie = params$porownanie,
+                  punkty = params$punkty,
+                  anova = params$anova,
+                  test_type = params$rodzaj_test,
+                  kontrola = params$kontrola,
+                  grupy_porownania = params$porownania,
+                  x_name = params$os_x_box,
+                  y_name = params$os_y_box,
+                  kolory = params$kolory,
+                  viridis = params$viridis,
+                  brewer = params$colorbrewer,
+                  wlasne = params$wlasne_kolory)
+
+return(p)
+
+```
+
+
+## Summary by group
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+dane2 <- dane
+
+colnames(dane2)[2] <- 'group'
+
+dane2 %>% dplyr::group_by(group) %>% 
+  dplyr::summarise(Mean = round(mean(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                   Median = round(median(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                   SD = round(sd(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                   Minimum = round(min(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
+                   Maximum = round(max(eval(parse(text = nazwy[1])), na.rm = TRUE),2), 
+                   n = length(eval(parse(text = nazwy[1]))),
+                   nor.conf.interval = round(1.96 * (SD/sqrt(n)),2))
+
+```
+
+
+
+## T.test
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+formula <- paste0(colnames(dane)[1], '~', colnames(dane)[2])
+
+ggpubr::compare_means(formula = as.formula(formula), dane, method = 't.test')
+
+```
+
+
+## Wilcoxon test
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+
+formula <- paste0(colnames(dane)[1], '~', colnames(dane)[2])
+
+ggpubr::compare_means(formula = as.formula(formula), dane)
+
+```
+
+
+## ANOVA - equal variances
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+formula <- paste0(colnames(dane)[1], '~', colnames(dane)[2])
+
+model <- stats::aov(formula = as.formula(formula), dane)
+
+summary(model)
+
+stats::TukeyHSD(model)
+
+tukey <- stats::TukeyHSD(model)
+
+tabela <- as.data.frame(tukey[[1]])
+tabela$zmienna <- rownames(tabela)
+p <- ggplot2::ggplot(tabela, ggplot2::aes(x = zmienna, y = diff, ymin = lwr, ymax = upr))
+p <- p + ggplot2::geom_pointrange()+
+  ggplot2::coord_flip()+
+  ggplot2::geom_hline(yintercept = 0)+
+  ggplot2::geom_errorbar(width = 0.2) + 
+  ggplot2::theme_bw()+
+  ggplot2::ggtitle('95 % confidence interval')+
+  ggplot2::ylab('') + 
+  ggplot2::xlab('Variable')
+
+print(p)
+```
+
+## ANOVA - variances not equal
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+dane2 <- na.omit(dane)
+dane2 <- as.data.frame(dane2)
+
+nazwy <- colnames(dane2)
+
+y <- dane2[,1]
+x <- dane2[,2]
+userfriendlyscience::oneway(y = y, x = x, posthoc = 'games-howell', digits = 3)
+
+
+```
+

@@ -185,6 +185,54 @@ app_server <- function( input, output, session ) {
     return(summ)
   })
   
+  # generuj raport html z danych
+  output$report <- downloadHandler(
+    filename <-  "EDA_report.html",
+    content = function(file) {
+      tempReport <- file.path(tempdir(), "EDA_report.rmd")
+      file.copy("R/EDA_report.rmd", tempReport, overwrite = TRUE)
+      params <- list(data = final(),
+                     facet = input$facet,
+                     os_y= input$os_y,
+                     os_x= input$os_x,
+                     os_y_nazwa= input$os_y_nazwa,
+                     kolory_hist= input$kolory_hist,
+                     viridis_hist= input$viridis_hist,
+                     colorbrewer_hist= input$colorbrewer_hist,
+                     wlasne_kolory_hist= input$wlasne_kolory_hist,
+                     bin= input$bin,
+                     fill_dens= input$fill_dens,
+                     os_x_dens= input$os_x_dens,
+                     os_y_dens= input$os_y_dens,
+                     kolory_dens= input$kolory_dens,
+                     viridis_dens= input$viridis_dens,
+                     colorbrewer_dens= input$colorbrewer_dens,
+                     wlasne_kolory_dens= input$wlasne_kolory_dens,
+                     boxviolin= input$boxviolin ,
+                     p_format= input$p_format ,
+                     porownanie= input$porownanie ,
+                     punkty= input$punkty ,
+                     anova= input$anova ,
+                     rodzaj_test= input$rodzaj_test ,
+                     kontrola= input$kontrola ,
+                     porownania= input$porownania ,
+                     os_x_box= input$os_x_box ,
+                     os_y_box= input$os_y_box ,
+                     kolory= input$kolory ,
+                     viridis= input$viridis ,
+                     colorbrewer= input$colorbrewer ,
+                     wlasne_kolory= input$wlasne_kolory
+                     
+                    )
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  )
+  
+  
+  
   histogramInput <- reactive({
     
     envir <- environment()

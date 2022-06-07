@@ -37,7 +37,11 @@ app_ui <- function(request) {
                                          radioButtons('format', 'Change dataformat to long?', choices = list('Yes' = TRUE, 'No' = FALSE), selected = FALSE, inline = TRUE),
                                          uiOutput('kolumna_var'),
                                          uiOutput('kolumna_factor'),
-                                         uiOutput('grupy')
+                                         uiOutput('grupy'),
+                                         downloadButton(
+                                           outputId = "report",
+                                           label = "Generate report"
+                                         )
                                          
                                          # radioButtons('format', 'Format dokumentu', c('HTML'),
                                          #              inline = TRUE),
