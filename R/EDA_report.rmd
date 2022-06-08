@@ -3,7 +3,9 @@ title: "EDA report"
 output: 
   html_document: 
     toc: yes
-date: '2022-06-06'
+    fig_width: 9
+    fig_height: 6.5
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 params:
   data: NULL
   facet: NULL
@@ -38,8 +40,6 @@ params:
   wlasne_kolory: NULL
 ---
 
-# EDA 
-
 ## Summary of data
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -54,8 +54,6 @@ table(dane[,2])
 ## Histogram
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-
 nazwy <- colnames(dane)
 
 
@@ -104,8 +102,6 @@ print(p)
 
 ```
 
-
-
 ## Boxplot
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -136,7 +132,6 @@ return(p)
 
 ```
 
-
 ## Summary by group
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -152,23 +147,20 @@ dane2 %>% dplyr::group_by(group) %>%
                    Minimum = round(min(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
                    Maximum = round(max(eval(parse(text = nazwy[1])), na.rm = TRUE),2), 
                    n = length(eval(parse(text = nazwy[1]))),
-                   nor.conf.interval = round(1.96 * (SD/sqrt(n)),2))
+                   Conf_interval_0.95 = round(1.96 * (SD/sqrt(n)),2)) %>%
+  knitr::kable()
 
 ```
 
-
-
 ## T.test
-
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 formula <- paste0(colnames(dane)[1], '~', colnames(dane)[2])
 
-ggpubr::compare_means(formula = as.formula(formula), dane, method = 't.test')
+ggpubr::compare_means(formula = as.formula(formula), dane, method = 't.test') %>% knitr::kable()
 
 ```
-
 
 ## Wilcoxon test
 
@@ -177,10 +169,9 @@ ggpubr::compare_means(formula = as.formula(formula), dane, method = 't.test')
 
 formula <- paste0(colnames(dane)[1], '~', colnames(dane)[2])
 
-ggpubr::compare_means(formula = as.formula(formula), dane)
+ggpubr::compare_means(formula = as.formula(formula), dane) %>% knitr::kable()
 
 ```
-
 
 ## ANOVA - equal variances
 
@@ -213,7 +204,6 @@ print(p)
 
 ## ANOVA - variances not equal
 
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 dane2 <- na.omit(dane)
@@ -225,6 +215,22 @@ y <- dane2[,1]
 x <- dane2[,2]
 userfriendlyscience::oneway(y = y, x = x, posthoc = 'games-howell', digits = 3)
 
+games <- userfriendlyscience::oneway(y = y, x = x, posthoc = 'games-howell', digits = 3)
+
+tabela <- games$intermediate$posthoc
+
+tabela$zmienna <- rownames(tabela)
+p <- ggplot2::ggplot(tabela, ggplot2::aes(x = zmienna, y = diff, ymin = ci.lo, ymax = ci.hi))
+p <- p + ggplot2::geom_pointrange()+
+  ggplot2::coord_flip()+
+  ggplot2::geom_hline(yintercept = 0)+
+  ggplot2::geom_errorbar(width = 0.2) + 
+  ggplot2::theme_bw()+
+  ggplot2::ggtitle('95 % confidence interval')+
+  ggplot2::ylab('') + 
+  ggplot2::xlab('Variable')
+
+print(p)
 
 ```
 

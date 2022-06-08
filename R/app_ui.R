@@ -38,6 +38,7 @@ app_ui <- function(request) {
                                          uiOutput('kolumna_var'),
                                          uiOutput('kolumna_factor'),
                                          uiOutput('grupy'),
+                                         h5('Produce html report containing all plots and statistical tests, may take a minute to compute :)'),
                                          downloadButton(
                                            outputId = "report",
                                            label = "Generate report"
@@ -139,7 +140,7 @@ app_ui <- function(request) {
                                            c('Boxplot' = 'Boxplot', 'Violin' = 'Violin'
                                              #, 
                                              #'Mean with confidence intervals' = 'mean_ci'
-                                             ), 
+                                           ), 
                                            inline = TRUE),
                               radioButtons('porownanie', 'Choose comparison type (for p-value display)', 
                                            list('None' = 'brak', 'Against control' = 'kontrola', 
@@ -231,7 +232,11 @@ app_ui <- function(request) {
                                                       choices = list("Yes (will use Tukey post-hoc test)" = "TRUE", "No (will use Games-Howell post-hoc test)" = "FALSE"), selected = "TRUE")),
                             mainPanel(verbatimTextOutput("anova1"),
                                       verbatimTextOutput("anova2"),
-                                      plotOutput('anova_plot'))
+                                      conditionalPanel(
+                                        condition = "input.posthoc == 'TRUE'",
+                                        plotOutput('anova_plot')
+                                      ),
+                                      plotOutput('anova_plot_games'))
                           )
                  ),
                  tabPanel("Scatterplot",

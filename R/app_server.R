@@ -382,7 +382,7 @@ app_server <- function( input, output, session ) {
                         Minimum = round(min(eval(parse(text = nazwy[1])), na.rm = TRUE),2),
                         Maximum = round(max(eval(parse(text = nazwy[1])), na.rm = TRUE),2), 
                         n = length(eval(parse(text = nazwy[1]))),
-                        nor.conf.interval = round(1.96 * (SD/sqrt(n)),2))
+                        Conf_interval_0.95 = round(1.96 * (SD/sqrt(n)),2))
     
   })
   
@@ -503,6 +503,40 @@ app_server <- function( input, output, session ) {
     }
   })
   
+  output$anova_plot_games <- renderPlot({
+    if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
+      return(NULL)
+    
+    if(input$posthoc == FALSE){
+      
+      dane <- final()
+      
+      dane <- na.omit(dane)
+      dane <- as.data.frame(dane)
+      
+      nazwy <- colnames(dane)
+      
+      y <- dane[,1]
+      x <- dane[,2]
+      games <- userfriendlyscience::oneway(y = y, x = x, posthoc = 'games-howell', digits = 3)
+      
+      tabela <- games$intermediate$posthoc
+      
+      tabela$zmienna <- rownames(tabela)
+      p <- ggplot2::ggplot(tabela, ggplot2::aes(x = zmienna, y = diff, ymin = ci.lo, ymax = ci.hi))
+      p <- p + ggplot2::geom_pointrange()+
+        ggplot2::coord_flip()+
+        ggplot2::geom_hline(yintercept = 0)+
+        ggplot2::geom_errorbar(width = 0.2) + 
+        ggplot2::theme_bw()+
+        ggplot2::ggtitle('95 % confidence interval')+
+        ggplot2::ylab('') + 
+        ggplot2::xlab('Variable')
+      
+      print(p)
+    }
+  })
+  
   output$anova_plot <- renderPlot({
     if (is.null(input$dane)&is.null(input$dane_xls) & input$rodzaj_dane != 'example')
       return(NULL)
@@ -535,6 +569,7 @@ app_server <- function( input, output, session ) {
       print(p)
     }
   })
+  
   
   output$kolumna_scatter_x <- renderUI({
     if (is.null(input$dane) & is.null(input$dane_xls) & input$rodzaj_dane != 'example')
