@@ -18,7 +18,7 @@ app_server <- function( input, output, session ) {
         # d <- przyklad
         # return(d)
         return(NULL)
-      d <- data.table::rbindlist(lapply(input$dane$datapath, read.table),
+      d <- data.table::rbindlist(lapply(input$dane$datapath, read.table, header=as.logical(input$header)),
                                  use.names = TRUE, fill = TRUE)
       #d <- read.table(inFile$datapath, header=as.logical(input$header), fill = TRUE, sep = input$sep, quote = "\"")
       return(d)
