@@ -54,17 +54,22 @@ table(dane[,2])
 ## Histogram
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-nazwy <- colnames(dane)
+  nazwy <- colnames(dane)
 
 
 if(params$bin == 0){
+
+ # domyślnie zgaduje szerokość słupków do histogramu na podstawie zakresu danych
+ # bin <- abs((range(dane[,nazwy[1]])[2] - range(dane[,nazwy[1]])[1])/20)
+  bin = 1
   
-  # domyślnie zgaduje szerokość słupków do histogramu na podstawie zakresu danych
-  bin <- abs((range(dane[,nazwy[1]])[2] - range(dane[,nazwy[1]])[1])/20) 
 } else {
-  
+
   bin <- params$bin
 }
+
+bin
+
 
 p <- draw_histogram(wb = dane,
                     variable = nazwy[1],
@@ -79,7 +84,7 @@ p <- draw_histogram(wb = dane,
                     brewer = params$colorbrewer_hist,
                     wlasne = params$wlasne_kolory_hist)
 
-print(p)
+ print(p)
 
 ```
 
@@ -156,27 +161,33 @@ dane2 %>% dplyr::group_by(group) %>%
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
+if(length(unique(dane2$group)) > 1){
+
 formula <- paste0(colnames(dane)[1], '~', colnames(dane)[2])
 
 ggpubr::compare_means(formula = as.formula(formula), dane, method = 't.test') %>% knitr::kable()
 
+}
 ```
 
 ## Wilcoxon test
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
+if(length(unique(dane2$group)) > 1){
 
 formula <- paste0(colnames(dane)[1], '~', colnames(dane)[2])
 
 ggpubr::compare_means(formula = as.formula(formula), dane) %>% knitr::kable()
 
+}
 ```
 
 ## ANOVA - equal variances
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
+if(length(unique(dane2$group)) > 1){
 formula <- paste0(colnames(dane)[1], '~', colnames(dane)[2])
 
 model <- stats::aov(formula = as.formula(formula), dane)
@@ -200,12 +211,14 @@ p <- p + ggplot2::geom_pointrange()+
   ggplot2::xlab('Variable')
 
 print(p)
+}
 ```
 
 ## ANOVA - variances not equal
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
+if(length(unique(dane2$group)) > 1){
 dane2 <- na.omit(dane)
 dane2 <- as.data.frame(dane2)
 
@@ -231,6 +244,6 @@ p <- p + ggplot2::geom_pointrange()+
   ggplot2::xlab('Variable')
 
 print(p)
-
+}
 ```
 
