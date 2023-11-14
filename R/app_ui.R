@@ -34,7 +34,7 @@ app_ui <- function(request) {
                                                                        ' ', inline = TRUE)
                                          ),
                                          radioButtons("header", "Do data contain headers?", choices = list("Yes" = TRUE, "No" = FALSE), selected = TRUE, inline = TRUE),
-                                         radioButtons('format', 'Change dataformat to long?', choices = list('Yes' = TRUE, 'No' = FALSE), selected = FALSE, inline = TRUE),
+                                         radioButtons('format', 'Change data format to long?', choices = list('Yes' = TRUE, 'No' = FALSE), selected = FALSE, inline = TRUE),
                                          uiOutput('kolumna_var'),
                                          uiOutput('kolumna_factor'),
                                          uiOutput('grupy'),

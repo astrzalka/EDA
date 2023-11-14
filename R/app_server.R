@@ -158,6 +158,9 @@ app_server <- function( input, output, session ) {
     
     grupy <- unique(dane$grupy)
     
+    if (length(grupy) > 30)
+      return(NULL)
+    
     checkboxGroupInput("grupy", label = ("Filter groups for analysis"), 
                        choices = grupy,
                        selected = grupy)
