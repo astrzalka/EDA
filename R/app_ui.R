@@ -251,7 +251,7 @@ app_ui <- function(request) {
                                    
                                    #numericInput('alpha_point', 'Podaj zakres alpha dla punktów', value = 1, min = 0, max = 1, step = 0.1),
                                    sliderInput("alpha_point", "Choose point alpha value", min = 0, max = 1, value = 1, step = 0.1),
-                                   sliderInput("size_point", "Choos epoint size", min = 1, max = 10, value = 2, step = 0.5),
+                                   sliderInput("size_point", "Choose point size", min = 1, max = 10, value = 2, step = 0.5),
                                    radioButtons('kolory_scatter', 'Choose color scale', c('default', 'colorbrewer', 'viridis', 'grayscale', 'custom'),
                                                 selected = 'default', inline = TRUE),
                                    conditionalPanel(
