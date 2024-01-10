@@ -228,11 +228,20 @@ draw_boxplot <- function(wb,
         my_comparisons <- stringr::str_split(grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
         
+        p_adj <- sigminer::get_adj_p(wb,
+                           .col = y_var, .grp = x_var,
+                           comparisons = my_comparisons,
+                           method = test_type,
+                           p.adjust.method = 'holm')
+        
+        
         p <- ggpubr::ggboxplot(wb, x = x_var, y = y_var,
                                color = x_var,  
                                xlab = x_name, ylab = y_name)
-        p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
-                                            method = test_type, comparisons = my_comparisons)
+        # p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
+        #                                     method = test_type, comparisons = my_comparisons)
+        
+        p <- p + ggpubr::stat_pvalue_manual(p_adj, label = "p.adj")
         
       }
     }
@@ -263,11 +272,16 @@ draw_boxplot <- function(wb,
         my_comparisons <- stringr::str_split( grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
         
+        p_adj <- sigminer::get_adj_p(wb,
+                                     .col = y_var, .grp = x_var,
+                                     comparisons = my_comparisons,
+                                     method = test_type,
+                                     p.adjust.method = 'holm')
+        
         p <- ggpubr::ggboxplot(wb, x = x_var, y = y_var,
                                color = x_var,  
                                xlab = x_name, ylab = y_name)
-        p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                            method = test_type, comparisons = my_comparisons)
+        p <- p + ggpubr::stat_pvalue_manual(p_adj, label = "p.signif")
         
       }
       
@@ -296,15 +310,20 @@ draw_boxplot <- function(wb,
       
       if(porownanie == 'grupy'){
         
-        
         my_comparisons <- stringr::str_split( grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
+        
+        p_adj <- sigminer::get_adj_p(wb,
+                                     .col = y_var, .grp = x_var,
+                                     comparisons = my_comparisons,
+                                     method = test_type,
+                                     p.adjust.method = 'holm')
         
         p <- ggpubr::ggviolin(wb, x = x_var, y = y_var,
                               color = x_var,
                               xlab = x_name, ylab = y_name)
-        p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
-                                            method = test_type, comparisons = my_comparisons)
+        p <- p + ggpubr::stat_pvalue_manual(p_adj, label = "p.adj")
+        
         
       }
     }
@@ -331,15 +350,20 @@ draw_boxplot <- function(wb,
       
       if(porownanie == 'grupy'){
         
-        
         my_comparisons <- stringr::str_split( grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
+        
+        p_adj <- sigminer::get_adj_p(wb,
+                                     .col = y_var, .grp = x_var,
+                                     comparisons = my_comparisons,
+                                     method = test_type,
+                                     p.adjust.method = 'holm')
         
         p <- ggpubr::ggviolin(wb, x = x_var, y = y_var,
                               color = x_var,
                               xlab = x_name, ylab = y_name)
-        p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                            method = test_type, comparisons = my_comparisons)
+        p <- p + ggpubr::stat_pvalue_manual(p_adj, label = "p.signif")
+        
         
       }
     }
@@ -371,11 +395,17 @@ draw_boxplot <- function(wb,
         my_comparisons <- stringr::str_split( grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
         
+        p_adj <- sigminer::get_adj_p(wb,
+                                     .col = y_var, .grp = x_var,
+                                     comparisons = my_comparisons,
+                                     method = test_type,
+                                     p.adjust.method = 'holm')
+        
         p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = x_var, y = y_var,
                                  color = x_var,
                                  xlab = x_name, ylab = y_name)
-        p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.format..),
-                                            method = test_type, comparisons = my_comparisons)
+        p <- p + ggpubr::stat_pvalue_manual(p_adj, label = "p.adj")
+        
         
       }
       
@@ -408,11 +438,17 @@ draw_boxplot <- function(wb,
         my_comparisons <- stringr::str_split( grupy_porownania, ';')
         my_comparisons <- stringr::str_split(unlist(my_comparisons), ' ')
         
+        p_adj <- sigminer::get_adj_p(wb,
+                                     .col = y_var, .grp = x_var,
+                                     comparisons = my_comparisons,
+                                     method = test_type,
+                                     p.adjust.method = 'holm')
+        
         p <- ggpubr::ggerrorplot(wb, error.plot = 'crossbar', desc_stat = 'mean_ci', x = x_var, y = y_var,
                                  color = x_var,
                                  xlab = x_name, ylab = y_name)
-        p <- p + ggpubr::stat_compare_means(ggplot2::aes(label = ..p.signif..),
-                                            method = test_type, comparisons = my_comparisons)
+        p <- p + ggpubr::stat_pvalue_manual(p_adj, label = "p.signif")
+        
         
       }
       
