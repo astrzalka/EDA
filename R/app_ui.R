@@ -15,7 +15,7 @@ app_ui <- function(request) {
       navbarPage("EDA :) 1.4",
                  tabPanel("Data",
                           sidebarLayout(
-                            sidebarPanel("Load txt, csv or xlsx data file", 
+                            sidebarPanel("Load txt, csv or xlsx data file  ", 
                                          radioButtons('rodzaj_dane', 'Choose data file type?', c('txt', 'excel', 'example'), inline = TRUE),
                                          conditionalPanel(condition = 'input.rodzaj_dane == "txt"',
                                                           fileInput("dane", 'Choose .txt file',
